@@ -19,10 +19,9 @@ if [[ -d "${ROOT}/calamares" ]]; then
   cp -a "${ROOT}/calamares/branding" "${AIO}/etc/calamares/" 2>/dev/null || true
 fi
 
-if [[ -d "${ROOT}/sddm/enigmaos" ]]; then
-  mkdir -p "${AIO}/usr/share/sddm/themes"
-  cp -a "${ROOT}/sddm/enigmaos" "${AIO}/usr/share/sddm/themes/"
-fi
+# Custom SDDM theme is not shipped; greeter uses stock Breeze (see etc/sddm.conf*).
+rm -rf "${AIO}/usr/share/sddm/themes/enigmaos"
+
 if [[ -d "${ROOT}/plymouth/enigmaos" ]]; then
   mkdir -p "${AIO}/usr/share/plymouth/themes"
   cp -a "${ROOT}/plymouth/enigmaos" "${AIO}/usr/share/plymouth/themes/"

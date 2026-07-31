@@ -12,11 +12,12 @@ if command -v plymouth-set-default-theme >/dev/null 2>&1; then
   plymouth-set-default-theme -R enigmaos || true
 fi
 
-# SDDM theme
+# SDDM: stock Breeze greeter (custom enigmaos theme intentionally unused)
 mkdir -p /etc/sddm.conf.d
 cat >/etc/sddm.conf.d/10-enigmaos.conf <<'SDDM'
 [Theme]
-Current=enigmaos
+Current=breeze
+CursorTheme=breeze_cursors
 [General]
 DisplayServer=wayland
 SDDM
