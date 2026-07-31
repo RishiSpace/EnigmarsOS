@@ -56,3 +56,14 @@ rewrite the preset before generating initramfs.
 
 The installed system needs network access during install so `pacman` can
 fetch the kernel package set.
+
+## Bootloader
+
+Installed systems use **[Limine](https://github.com/Limine-Bootloader/Limine)**:
+
+- UEFI: `EFI/EnigmaOS/BOOTX64.EFI` (+ fallback `EFI/BOOT/BOOTX64.EFI`)
+- BIOS: `limine bios-install` on the target disk + `limine-bios.sys`
+- Config: `/boot/limine.conf` (also mirrored on the ESP when separate)
+
+The live USB still boots with Syslinux (BIOS) / systemd-boot (UEFI) because
+`mkarchiso` does not provide Limine bootmodes; only the **installed** OS uses Limine.
