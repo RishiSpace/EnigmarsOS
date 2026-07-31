@@ -4,8 +4,28 @@ set -euo pipefail
 
 echo "EnigmaOS post-install starting..."
 
-# Identity
-install -Dm644 /usr/lib/os-release /etc/os-release 2>/dev/null || true
+# Identity (hook may already have applied this)
+if [[ -x /usr/local/bin/enigmaos-branding ]]; then
+  /usr/local/bin/enigmaos-branding || true
+elif [[ -f /usr/lib/os-release ]]; then
+  # /etc/os-release is often a symlink — replace carefully
+  rm -f /etc/os-release
+  cp -f /usr/lib/os-release /etc/os-release || true
+fi
+
+# Ensure installed-system mkinitcpio preset (idempotent)
+if [[ -r /boot/vmlinuz-linux ]]; then
+  cat >/etc/mkinitcpio.d/linux.preset <<'EOF'
+ALL_config="/etc/mkinitcpio.conf"
+ALL_kver="/boot/vmlinuz-linux"
+PRESETS=('default' 'fallback')
+default_image="/boot/initramfs-linux.img"
+fallback_image="/boot/initramfs-linux-fallback.img"
+fallback_options="-S autodetect"
+EOF
+  rm -f /etc/mkinitcpio.conf.d/archiso.conf
+  mkinitcpio -P || true
+fi
 
 # Plymouth theme
 if command -v plymouth-set-default-theme >/dev/null 2>&1; then
@@ -39,6 +59,7 @@ if id live &>/dev/null; then
   userdel -r live 2>/dev/null || true
 fi
 rm -f /etc/sudoers.d/99-live
+rm -f /etc/polkit-1/rules.d/49-enigmaos-live.rules
 
 # AppArmor
 systemctl enable apparmor.service 2>/dev/null || true
@@ -50,11 +71,6 @@ echo "show=true" > /etc/skel/.config/enigmaos/welcome.conf
 # Reflector once
 if command -v reflector >/dev/null 2>&1; then
   reflector --protocol https --latest 15 --sort rate --save /etc/pacman.d/mirrorlist || true
-fi
-
-# Rebuild initramfs with encryption hooks if needed
-if command -v mkinitcpio >/dev/null 2>&1; then
-  mkinitcpio -P || true
 fi
 
 echo "EnigmaOS post-install complete."

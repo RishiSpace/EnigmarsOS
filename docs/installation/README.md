@@ -46,3 +46,13 @@ The **Welcome to EnigmaOS** app opens on first login:
 - Open documentation and community links
 
 Flatpak Flathub is preconfigured. Firmware updates appear in Discover when `fwupd` detects devices.
+
+## Installer notes
+
+If an older ISO fails at **mkinitcpio** with
+`/boot/vmlinuz-linux must be readable`, that image still used the live
+archiso initramfs preset. Current ISOs reinstall `linux` on the target and
+rewrite the preset before generating initramfs.
+
+The installed system needs network access during install so `pacman` can
+fetch the kernel package set.
