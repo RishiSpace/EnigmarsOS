@@ -3,9 +3,14 @@
 # Invoked with dontChroot: true — ${ROOT} is the target root mount.
 set -euo pipefail
 
+# Prefer env ROOT (from Calamares: env ROOT="${ROOT}" …); also accept argv.
+if [[ -z "${ROOT:-}" && -n "${1:-}" ]]; then
+  ROOT="$1"
+fi
 ROOT="${ROOT:-}"
 if [[ -z "${ROOT}" || ! -d "${ROOT}" ]]; then
   echo "ERROR: ROOT is not set or not a directory (got: '${ROOT:-}')" >&2
+  echo "Usage: env ROOT=/path/to/target $0   OR   $0 /path/to/target" >&2
   exit 1
 fi
 
