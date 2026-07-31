@@ -1,0 +1,23 @@
+[General]
+ColorScheme=EnigmaOS
+Name=EnigmaOS
+fixed=JetBrainsMono Nerd Font,10,-1,5,50,0,0,0,0,0
+font=Inter,10,-1,5,50,0,0,0,0,0
+menuFont=Inter,10,-1,5,50,0,0,0,0,0
+smallestReadableFont=Inter,8,-1,5,50,0,0,0,0,0
+toolBarFont=Inter,10,-1,5,50,0,0,0,0,0
+
+[Icons]
+Theme=Papirus-Dark
+
+[KDE]
+LookAndFeelPackage=org.enigmaos.desktop
+SingleClick=false
+widgetStyle=Breeze
+
+[KScreen]
+ScreenScaleFactors=
+ScaleFactor=1
+
+[ColorEffects:Disabled]
+Color=32,32,32

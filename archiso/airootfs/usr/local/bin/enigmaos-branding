@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cat >/usr/lib/os-release <<'OS'
+NAME="EnigmaOS"
+PRETTY_NAME="EnigmaOS"
+ID=enigmaos
+ID_LIKE=arch
+BUILD_ID=rolling
+ANSI_COLOR="0;36"
+HOME_URL="https://enigmaos.rishispace.dev/"
+DOCUMENTATION_URL="https://enigmaos.rishispace.dev/docs/"
+SUPPORT_URL="https://github.com/RishiSpace/EnigmaOS/issues"
+BUG_REPORT_URL="https://github.com/RishiSpace/EnigmaOS/issues"
+PRIVACY_POLICY_URL="https://enigmaos.rishispace.dev/privacy"
+LOGO=enigmaos
+OS
+install -Dm644 /usr/lib/os-release /etc/os-release
+if [[ ! -f /etc/motd ]] || ! grep -q EnigmaOS /etc/motd 2>/dev/null; then
+cat >/etc/motd <<'MOTD'
+Welcome to EnigmaOS
+
+  Privacy first · Secure by default · Ready immediately
+
+MOTD
+fi

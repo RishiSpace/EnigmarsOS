@@ -1,0 +1,15 @@
+# Optional AUR / external packages for a full EnigmaOS experience.
+# Build into a custom [enigmaos] repo or install post-setup.
+#
+# heroic-games-launcher
+# protonup-qt
+# dxvk-bin
+# vkd3d-proton-bin
+# vscodium-bin
+# pnpm (or use corepack / npm i -g)
+# yarn
+# uv
+# rate-mirrors
+# yay or paru
+# limine (if not using systemd-boot/grub only)
+# sddm-theme custom is shipped in-tree under sddm/

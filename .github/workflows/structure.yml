@@ -1,0 +1,17 @@
+name: Structure
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  check:
+    name: Validate structure
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run structure check
+        run: bash ./scripts/dev/sync-airootfs-check.sh
+      - name: Branding URL
+        run: grep -q 'enigmaos.rishispace.dev' archiso/airootfs/usr/share/libalpm/scripts/enigmaos-os-release

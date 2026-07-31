@@ -1,0 +1,12 @@
+[Unit]
+Description=Ensure EnigmaOS live user home and groups
+After=local-fs.target
+Before=display-manager.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/bin/enigmaos-setup-live-user
+
+[Install]
+WantedBy=multi-user.target

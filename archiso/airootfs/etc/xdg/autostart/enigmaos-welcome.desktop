@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Welcome to EnigmaOS
+Exec=enigmaos-welcome
+Icon=enigmaos
+Terminal=false
+Categories=System;
+X-KDE-autostart-phase=1
+X-GNOME-Autostart-enabled=true
+OnlyShowIn=KDE;

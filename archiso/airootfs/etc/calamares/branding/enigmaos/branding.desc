@@ -1,0 +1,36 @@
+---
+componentName:  enigmaos
+welcomeStyleCalamares:   true
+welcomeExpandingLogo:    true
+windowExpanding:         normal
+windowSize:              1000px,680px
+windowPlacement:         center
+
+strings:
+    productName:         EnigmaOS
+    shortProductName:    EnigmaOS
+    version:             Rolling
+    shortVersion:        rolling
+    versionedName:       EnigmaOS Rolling
+    shortVersionedName:  EnigmaOS
+    bootloaderEntryName: EnigmaOS
+    productUrl:          https://enigmaos.rishispace.dev
+    supportUrl:          https://enigmaos.rishispace.dev/docs
+    knownIssuesUrl:      https://github.com/RishiSpace/EnigmaOS/issues
+    releaseNotesUrl:     https://enigmaos.rishispace.dev/changelog
+    donateUrl:           https://enigmaos.rishispace.dev/donate
+
+images:
+    productLogo:         "logo.png"
+    productIcon:         "logo.png"
+    productWelcome:      "welcome.png"
+    productWallpaper:    "wallpaper.png"
+
+slideshow:               "show.qml"
+slideshowAPI:            2
+
+style:
+   sidebarBackground:    "#000000"
+   sidebarText:          "#FFFFFF"
+   sidebarTextSelect:    "#00E5FF"
+   sidebarTextHighlight: "#7B2FFF"

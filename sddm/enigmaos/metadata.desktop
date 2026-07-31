@@ -1,0 +1,16 @@
+[SddmGreeterTheme]
+Name=EnigmaOS
+Description=EnigmaOS AMOLED login theme
+Author=EnigmaOS
+Copyright=(c) 2024-2026 EnigmaOS
+License=GPL-3.0-or-later
+Type=sddm-theme
+Version=1.0.0
+Website=https://enigmaos.rishispace.dev
+Screenshot=preview.png
+MainScript=Main.qml
+ConfigFile=theme.conf
+TranslationsDirectory=translations
+Theme-Id=enigmaos
+Theme-API=2.0
+QtVersion=6

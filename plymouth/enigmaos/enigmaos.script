@@ -1,0 +1,34 @@
+# EnigmaOS Plymouth script — pure black, cyan accent, logo fade
+Window.SetBackgroundTopColor(0.00, 0.00, 0.00);
+Window.SetBackgroundBottomColor(0.00, 0.00, 0.00);
+
+logo.image = Image("logo.png");
+logo.sprite = Sprite(logo.image);
+logo.sprite.SetX(Window.GetWidth() / 2 - logo.image.GetWidth() / 2);
+logo.sprite.SetY(Window.GetHeight() / 2 - logo.image.GetHeight() / 2 - 40);
+logo.sprite.SetOpacity(0);
+
+progress = 0;
+fun refresh_callback() {
+    progress += 0.02;
+    if (progress > 1) progress = 1;
+    logo.sprite.SetOpacity(progress);
+}
+Plymouth.SetRefreshFunction(refresh_callback);
+
+message.image = Image.Text("EnigmaOS", 1, 1, 1, 1, "Inter");
+message.sprite = Sprite(message.image);
+message.sprite.SetX(Window.GetWidth() / 2 - message.image.GetWidth() / 2);
+message.sprite.SetY(Window.GetHeight() / 2 + 80);
+
+status.image = Image.Text("", 0.0, 0.9, 1.0, 1, "Inter");
+status.sprite = Sprite(status.image);
+status.sprite.SetX(Window.GetWidth() / 2 - status.image.GetWidth() / 2);
+status.sprite.SetY(Window.GetHeight() / 2 + 120);
+
+fun message_callback(text) {
+    status.image = Image.Text(text, 0.0, 0.9, 1.0, 1, "Inter");
+    status.sprite.SetImage(status.image);
+    status.sprite.SetX(Window.GetWidth() / 2 - status.image.GetWidth() / 2);
+}
+Plymouth.SetMessageFunction(message_callback);

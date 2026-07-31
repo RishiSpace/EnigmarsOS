@@ -1,0 +1,53 @@
+# Maintainer: EnigmaOS builders
+# Vendored build of Calamares for the ISO builder image (not in official Arch repos).
+pkgname=calamares
+pkgver=3.3.14
+pkgrel=1
+pkgdesc="Distribution-independent installer framework"
+arch=('x86_64')
+url="https://calamares.io/"
+license=('GPL-3.0-or-later')
+depends=(
+  'kconfig' 'kcoreaddons' 'kcrash' 'ki18n' 'kparts' 'kpmcore'
+  'kservice' 'kwidgetsaddons' 'qt6-base' 'qt6-declarative' 'qt6-svg'
+  'solid' 'yaml-cpp' 'polkit-qt6' 'boost-libs' 'libpwquality'
+  'python' 'python-jsonschema' 'ckbcomp' 'appstream-qt' 'kio' 'kxmlgui'
+)
+makedepends=(
+  'extra-cmake-modules' 'cmake' 'ninja' 'qt6-tools' 'qt6-translations'
+  'boost' 'git'
+)
+optdepends=(
+  'gptfdisk: for creating partitions'
+  'rsync: for full disk copy install modes'
+)
+source=("calamares-${pkgver}.tar.gz")
+sha256sums=('fa158d679bb9384beaf4a2f821be6da63500b13631ad14acec9bb446565dad4a')
+
+prepare() {
+  # GitHub archive extracts to calamares-3.3.14 or calamares-calamares-<hash>
+  if [[ -d "${srcdir}/calamares-${pkgver}" ]]; then
+    :
+  else
+    # rename single top-level dir
+    local d
+    d="$(find "${srcdir}" -mindepth 1 -maxdepth 1 -type d | head -1)"
+    mv "$d" "${srcdir}/calamares-${pkgver}"
+  fi
+}
+
+build() {
+  cmake -S "calamares-${pkgver}" -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DWITH_QT6=ON \
+    -DWITH_PYTHON=ON \
+    -DWITH_PYBIND11=OFF \
+    -DINSTALL_CONFIG=ON
+  cmake --build build
+}
+
+package() {
+  DESTDIR="${pkgdir}" cmake --install build
+}

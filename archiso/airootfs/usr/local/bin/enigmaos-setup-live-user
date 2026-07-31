@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if ! id live &>/dev/null; then
+  useradd -m -u 1000 -G wheel,audio,video,storage,optical,network,rfkill,sys,input,lp,docker,libvirt \
+    -s /usr/bin/zsh live 2>/dev/null \
+  || useradd -m -u 1000 -G wheel,audio,video,storage,optical,network,rfkill,sys,input,lp \
+    -s /bin/bash live
+  echo "live:live" | chpasswd
+fi
+
+if [[ -d /etc/skel && -d /home/live ]]; then
+  # Only copy missing skel files
+  shopt -s dotglob nullglob
+  for f in /etc/skel/*; do
+    base="$(basename "$f")"
+    if [[ ! -e "/home/live/$base" ]]; then
+      cp -a "$f" "/home/live/$base"
+    fi
+  done
+  chown -R live:live /home/live
+fi
+
+# SDDM autologin for live session
+mkdir -p /etc/sddm.conf.d
+cat >/etc/sddm.conf.d/autologin.conf <<'SDDM'
+[Autologin]
+User=live
+Session=plasma
+SDDM

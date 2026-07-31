@@ -1,0 +1,6 @@
+/* Allow live user to run installer without password prompts where possible */
+polkit.addRule(function(action, subject) {
+    if (subject.user == "live") {
+        return polkit.Result.YES;
+    }
+});

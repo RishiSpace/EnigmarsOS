@@ -1,0 +1,47 @@
+# EnigmaOS Starship prompt — minimal, fast, cyan accent
+format = """
+$username\
+$hostname\
+$directory\
+$git_branch\
+$git_status\
+$python\
+$rust\
+$nodejs\
+$golang\
+$docker_context\
+$cmd_duration\
+$line_break\
+$character"""
+
+add_newline = true
+
+[character]
+success_symbol = "[❯](bold cyan)"
+error_symbol = "[❯](bold red)"
+
+[directory]
+style = "bold cyan"
+truncation_length = 3
+truncate_to_repo = true
+
+[git_branch]
+symbol = " "
+style = "bold purple"
+
+[git_status]
+style = "bold yellow"
+
+[cmd_duration]
+min_time = 500
+style = "yellow"
+format = "[$duration]($style) "
+
+[username]
+style_user = "bold white"
+format = "[$user]($style) "
+show_always = false
+
+[hostname]
+ssh_only = true
+format = "at [$hostname](bold purple) "

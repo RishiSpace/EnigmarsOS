@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Install EnigmaOS
+GenericName=System Installer
+Comment=Install EnigmaOS on your computer
+Exec=sudo -E /usr/bin/calamares
+Icon=enigmaos
+Terminal=false
+Categories=System;Settings;
+Keywords=install;calamares;setup;
+StartupNotify=true
+X-KDE-SubstituteUID=true

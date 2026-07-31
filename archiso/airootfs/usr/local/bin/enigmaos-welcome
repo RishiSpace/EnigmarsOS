@@ -1,0 +1,395 @@
+#!/usr/bin/env python3
+"""EnigmaOS Welcome — first-run / always-available companion app."""
+from __future__ import annotations
+
+import os
+import shutil
+import subprocess
+import sys
+import webbrowser
+from pathlib import Path
+
+# Prefer PySide6, fall back to PyQt6
+try:
+    from PySide6.QtCore import Qt, QSize, QProcess
+    from PySide6.QtGui import QFont, QIcon, QPixmap, QColor, QPalette
+    from PySide6.QtWidgets import (
+        QApplication,
+        QWidget,
+        QVBoxLayout,
+        QHBoxLayout,
+        QLabel,
+        QPushButton,
+        QFrame,
+        QScrollArea,
+        QMessageBox,
+        QCheckBox,
+        QGridLayout,
+        QSizePolicy,
+        QSpacerItem,
+    )
+except ImportError:  # pragma: no cover
+    from PyQt6.QtCore import Qt, QSize, QProcess
+    from PyQt6.QtGui import QFont, QIcon, QPixmap, QColor, QPalette
+    from PyQt6.QtWidgets import (
+        QApplication,
+        QWidget,
+        QVBoxLayout,
+        QHBoxLayout,
+        QLabel,
+        QPushButton,
+        QFrame,
+        QScrollArea,
+        QMessageBox,
+        QCheckBox,
+        QGridLayout,
+        QSizePolicy,
+        QSpacerItem,
+    )
+
+ACCENT = "#00E5FF"
+PURPLE = "#7B2FFF"
+BG = "#000000"
+CARD = "#0C0C0C"
+BORDER = "#1E1E1E"
+TEXT = "#F5F5F5"
+MUTED = "#8A8A8A"
+
+LINKS = {
+    "Documentation": "https://enigmaos.rishispace.dev/docs",
+    "Website": "https://enigmaos.rishispace.dev",
+    "GitHub": "https://github.com/RishiSpace/EnigmaOS",
+    "Issues": "https://github.com/RishiSpace/EnigmaOS/issues",
+    "Discord": "https://discord.gg/enigmaos",
+    "Changelog": "https://enigmaos.rishispace.dev/changelog",
+    "Release Notes": "https://enigmaos.rishispace.dev/releases",
+}
+
+LOGO_CANDIDATES = [
+    Path("/usr/share/enigmaos/logos/EnigmaOS.png"),
+    Path("/usr/share/pixmaps/enigmaos.png"),
+    Path(__file__).resolve().parent / "EnigmaOS.png",
+]
+
+
+def run_cmd(cmd: list[str], pkexec: bool = False) -> None:
+    if pkexec and shutil.which("pkexec"):
+        cmd = ["pkexec", *cmd]
+    try:
+        subprocess.Popen(cmd)
+    except FileNotFoundError:
+        QMessageBox.warning(None, "EnigmaOS", f"Command not found: {cmd[0]}")
+
+
+def driver_status() -> str:
+    lines: list[str] = []
+    # GPUs from lspci if available
+    if shutil.which("lspci"):
+        try:
+            out = subprocess.check_output(
+                ["lspci", "-nn"], text=True, stderr=subprocess.DEVNULL
+            )
+            gpus = [l for l in out.splitlines() if "VGA" in l or "3D" in l or "Display" in l]
+            if gpus:
+                lines.append("GPUs:")
+                lines.extend(f"  • {g.strip()}" for g in gpus)
+            else:
+                lines.append("No discrete/display GPU reported by lspci.")
+        except subprocess.CalledProcessError:
+            lines.append("Unable to query PCI devices.")
+    else:
+        lines.append("lspci not available.")
+
+    # NVIDIA module?
+    nvidia = Path("/proc/driver/nvidia/version")
+    if nvidia.exists():
+        lines.append("NVIDIA proprietary driver: loaded")
+    elif Path("/usr/lib/modules").exists():
+        lines.append("NVIDIA proprietary driver: not loaded (use nouveau/mesa or install nvidia)")
+
+    # Vulkan
+    if shutil.which("vulkaninfo"):
+        lines.append("Vulkan: vulkaninfo present")
+    else:
+        lines.append("Vulkan tools: not installed")
+
+    return "\n".join(lines)
+
+
+class Card(QFrame):
+    def __init__(self, title: str, body: str = "", parent=None):
+        super().__init__(parent)
+        self.setObjectName("card")
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(18, 16, 18, 16)
+        layout.setSpacing(8)
+        t = QLabel(title)
+        t.setObjectName("cardTitle")
+        layout.addWidget(t)
+        if body:
+            b = QLabel(body)
+            b.setObjectName("muted")
+            b.setWordWrap(True)
+            layout.addWidget(b)
+        self.body_layout = layout
+
+
+class WelcomeWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Welcome to EnigmaOS")
+        self.setMinimumSize(920, 640)
+        self.resize(1000, 700)
+        self._build()
+
+    def _build(self) -> None:
+        root = QVBoxLayout(self)
+        root.setContentsMargins(28, 24, 28, 24)
+        root.setSpacing(18)
+
+        # Header
+        header = QHBoxLayout()
+        logo_lbl = QLabel()
+        logo_lbl.setFixedSize(72, 72)
+        for p in LOGO_CANDIDATES:
+            if p.is_file():
+                pix = QPixmap(str(p)).scaled(
+                    72, 72, Qt.AspectRatioMode.KeepAspectRatio,
+                    Qt.TransformationMode.SmoothTransformation
+                )
+                logo_lbl.setPixmap(pix)
+                break
+        header.addWidget(logo_lbl)
+
+        titles = QVBoxLayout()
+        h = QLabel("Welcome to EnigmaOS")
+        h.setObjectName("hero")
+        s = QLabel("Privacy first · Secure by default · Ready immediately")
+        s.setObjectName("accent")
+        titles.addWidget(h)
+        titles.addWidget(s)
+        header.addLayout(titles)
+        header.addStretch()
+        root.addLayout(header)
+
+        # Scroll content
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.Shape.NoFrame)
+        content = QWidget()
+        grid = QGridLayout(content)
+        grid.setSpacing(14)
+        grid.setContentsMargins(0, 0, 4, 0)
+
+        # Actions card
+        actions = Card("Get started")
+        btn_row = QGridLayout()
+        buttons = [
+            ("Update System", self.update_system),
+            ("Install Software", self.open_discover),
+            ("Gaming Overview", self.gaming_overview),
+            ("Driver Status", self.show_drivers),
+            ("Documentation", lambda: webbrowser.open(LINKS["Documentation"])),
+            ("Website", lambda: webbrowser.open(LINKS["Website"])),
+            ("GitHub", lambda: webbrowser.open(LINKS["GitHub"])),
+            ("Discord", lambda: webbrowser.open(LINKS["Discord"])),
+            ("Issue Tracker", lambda: webbrowser.open(LINKS["Issues"])),
+            ("Changelog", lambda: webbrowser.open(LINKS["Changelog"])),
+            ("Release Notes", lambda: webbrowser.open(LINKS["Release Notes"])),
+            ("System Settings", lambda: run_cmd(["systemsettings"])),
+        ]
+        for i, (label, cb) in enumerate(buttons):
+            b = QPushButton(label)
+            b.setCursor(Qt.CursorShape.PointingHandCursor)
+            b.clicked.connect(cb)
+            b.setMinimumHeight(40)
+            btn_row.addWidget(b, i // 3, i % 3)
+        actions.body_layout.addLayout(btn_row)
+        grid.addWidget(actions, 0, 0, 1, 2)
+
+        gaming = Card(
+            "Gaming",
+            "Steam, Lutris, Heroic, Wine, DXVK/VKD3D, GameMode, MangoHud, "
+            "Gamescope and ProtonUp-Qt are ready. Enable multilib is default. "
+            "Launch Steam or open Discover for more titles.",
+        )
+        grid.addWidget(gaming, 1, 0)
+
+        dev = Card(
+            "Development",
+            "GCC/Clang, Rust, Go, Node, Python, Docker, Podman, QEMU/KVM, "
+            "Neovim and VSCodium ship preinstalled. No language ecosystem setup required.",
+        )
+        grid.addWidget(dev, 1, 1)
+
+        security = Card(
+            "Security & Privacy",
+            "No telemetry. UFW and AppArmor enabled. HTTPS-only Firefox with "
+            "DNS-over-HTTPS and Enhanced Tracking Protection. LUKS supported at install.",
+        )
+        grid.addWidget(security, 2, 0)
+
+        links = Card("Community")
+        for name, url in LINKS.items():
+            b = QPushButton(f"Open {name}")
+            b.setFlat(True)
+            b.setStyleSheet(f"color: {ACCENT}; text-align: left; padding: 6px;")
+            b.setCursor(Qt.CursorShape.PointingHandCursor)
+            b.clicked.connect(lambda _=False, u=url: webbrowser.open(u))
+            links.body_layout.addWidget(b)
+        grid.addWidget(links, 2, 1)
+
+        scroll.setWidget(content)
+        root.addWidget(scroll, 1)
+
+        # Footer
+        footer = QHBoxLayout()
+        self.startup_cb = QCheckBox("Show Welcome on login")
+        self.startup_cb.setChecked(self._autostart_enabled())
+        self.startup_cb.toggled.connect(self._toggle_autostart)
+        footer.addWidget(self.startup_cb)
+        footer.addStretch()
+        close_btn = QPushButton("Close")
+        close_btn.clicked.connect(self.close)
+        footer.addWidget(close_btn)
+        root.addLayout(footer)
+
+    def update_system(self) -> None:
+        # Prefer konsole with pacman; fall back to discover
+        if shutil.which("konsole"):
+            run_cmd([
+                "konsole", "-e", "bash", "-lc",
+                "echo 'EnigmaOS system update'; sudo pacman -Syu; echo; read -n1 -p 'Press any key to close…'"
+            ])
+        else:
+            run_cmd(["plasma-discover", "--mode", "update"])
+
+    def open_discover(self) -> None:
+        if shutil.which("plasma-discover"):
+            run_cmd(["plasma-discover"])
+        elif shutil.which("discover"):
+            run_cmd(["discover"])
+        else:
+            QMessageBox.information(self, "EnigmaOS", "Discover is not installed.")
+
+    def gaming_overview(self) -> None:
+        QMessageBox.information(
+            self,
+            "Gaming on EnigmaOS",
+            "Preinstalled:\n"
+            "• Steam\n• Lutris\n• Heroic Games Launcher\n"
+            "• Wine / Winetricks\n• DXVK & VKD3D-Proton tooling\n"
+            "• Gamescope · GameMode · MangoHud · ProtonUp-Qt\n\n"
+            "Tips:\n"
+            "• Run games with gamemoderun for CPU governor hints\n"
+            "• Use MangoHud for overlays (MANGOHUD=1)\n"
+            "• Install NVIDIA proprietary drivers if you have NVIDIA GPUs\n"
+            "• Docs: https://enigmaos.rishispace.dev/docs/gaming",
+        )
+
+    def show_drivers(self) -> None:
+        QMessageBox.information(self, "Driver Status", driver_status())
+
+    def _autostart_path(self) -> Path:
+        return Path.home() / ".config/autostart/enigmaos-welcome.desktop"
+
+    def _autostart_enabled(self) -> bool:
+        return self._autostart_path().is_file()
+
+    def _toggle_autostart(self, enabled: bool) -> None:
+        path = self._autostart_path()
+        if enabled:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(
+                "[Desktop Entry]\n"
+                "Type=Application\n"
+                "Name=EnigmaOS Welcome\n"
+                "Exec=enigmaos-welcome\n"
+                "Icon=enigmaos\n"
+                "X-KDE-autostart-phase=1\n"
+                "X-GNOME-Autostart-enabled=true\n"
+            )
+        elif path.exists():
+            path.unlink()
+
+
+STYLE = f"""
+QWidget {{
+    background-color: {BG};
+    color: {TEXT};
+    font-family: Inter, "Noto Sans", sans-serif;
+    font-size: 13px;
+}}
+QLabel#hero {{
+    font-size: 26px;
+    font-weight: 600;
+}}
+QLabel#accent {{
+    color: {ACCENT};
+    font-size: 13px;
+}}
+QLabel#cardTitle {{
+    font-size: 16px;
+    font-weight: 600;
+}}
+QLabel#muted {{
+    color: {MUTED};
+}}
+QFrame#card {{
+    background-color: {CARD};
+    border: 1px solid {BORDER};
+    border-radius: 14px;
+}}
+QPushButton {{
+    background-color: #121212;
+    border: 1px solid {BORDER};
+    border-radius: 10px;
+    padding: 8px 14px;
+    color: {TEXT};
+}}
+QPushButton:hover {{
+    border: 1px solid {ACCENT};
+    color: {ACCENT};
+}}
+QPushButton:pressed {{
+    background-color: #1a1a1a;
+}}
+QCheckBox {{
+    color: {MUTED};
+    spacing: 8px;
+}}
+QScrollArea {{
+    background: transparent;
+    border: none;
+}}
+QMessageBox {{
+    background-color: {BG};
+}}
+"""
+
+
+def main() -> int:
+    app = QApplication(sys.argv)
+    app.setApplicationName("EnigmaOS Welcome")
+    app.setOrganizationName("EnigmaOS")
+    app.setStyle("Fusion")
+
+    pal = QPalette()
+    pal.setColor(QPalette.ColorRole.Window, QColor(BG))
+    pal.setColor(QPalette.ColorRole.WindowText, QColor(TEXT))
+    pal.setColor(QPalette.ColorRole.Base, QColor(CARD))
+    pal.setColor(QPalette.ColorRole.Text, QColor(TEXT))
+    pal.setColor(QPalette.ColorRole.Button, QColor("#121212"))
+    pal.setColor(QPalette.ColorRole.ButtonText, QColor(TEXT))
+    pal.setColor(QPalette.ColorRole.Highlight, QColor(ACCENT))
+    pal.setColor(QPalette.ColorRole.HighlightedText, QColor("#000000"))
+    app.setPalette(pal)
+    app.setStyleSheet(STYLE)
+
+    win = WelcomeWindow()
+    win.show()
+    return app.exec()
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

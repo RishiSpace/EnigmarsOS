@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# EnigmaOS first-boot helper (installed systems)
+set -euo pipefail
+
+FLAG="${XDG_CONFIG_HOME:-$HOME/.config}/enigmaos/firstboot-done"
+mkdir -p "$(dirname "$FLAG")"
+
+if [[ -f "$FLAG" ]]; then
+  exit 0
+fi
+
+# Ensure Flathub once per user session environment if flatpak exists
+if command -v flatpak >/dev/null 2>&1; then
+  flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo 2>/dev/null || true
+fi
+
+# Launch welcome if available
+if command -v enigmaos-welcome >/dev/null 2>&1; then
+  enigmaos-welcome || true
+fi
+
+date -Iseconds >"$FLAG"

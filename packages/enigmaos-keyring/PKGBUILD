@@ -1,0 +1,16 @@
+# Maintainer: EnigmaOS Team <rishi@rishispace.dev>
+pkgname=enigmaos-keyring
+pkgver=20260101
+pkgrel=1
+pkgdesc="EnigmaOS PGP keyring"
+arch=('any')
+url="https://enigmaos.rishispace.dev"
+license=('GPL-3.0-or-later')
+source=()
+sha256sums=()
+
+package() {
+  install -d "$pkgdir/usr/share/pacman/keyrings"
+  # Populate when release signing keys are generated
+  touch "$pkgdir/usr/share/pacman/keyrings/enigmaos.gpg"
+}

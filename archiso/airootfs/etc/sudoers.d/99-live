@@ -1,0 +1,2 @@
+# Live session only — removed / overridden on install by Calamares
+live ALL=(ALL) NOPASSWD: ALL

@@ -1,0 +1,38 @@
+# Build artifacts
+work/
+out/
+*.iso
+*.img
+*.sfs
+*.sig
+SHA256SUMS
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.idea/
+.vscode/
+*.iml
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Package build
+packages/**/pkg/
+packages/**/src/
+packages/**/*.pkg.tar*
+packages/**/*.log
+
+# Keys (never commit)
+*.pem
+*.key
+!**/keyring*/
+private/
+
+# Docker build cache (vendored tarball is kept)
+# docker/cache/*.tar.gz  # keep vendored calamares source
