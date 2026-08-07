@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
-# Runs inside the EnigmaOS Arch build container.
+# Runs inside the EnigmarsOS Arch build container.
 set -euo pipefail
 
-ROOT="${ENIGMAOS_ROOT:-/build}"
-PROFILE="${ENIGMAOS_PROFILE:-${ROOT}/archiso}"
-OUT="${ENIGMAOS_OUT:-${ROOT}/out}"
-WORK="${ENIGMAOS_WORK:-${ROOT}/work}"
+ROOT="${ENIGMARSOS_ROOT:-/build}"
+PROFILE="${ENIGMARSOS_PROFILE:-${ROOT}/archiso}"
+OUT="${ENIGMARSOS_OUT:-${ROOT}/out}"
+WORK="${ENIGMARSOS_WORK:-${ROOT}/work}"
 
 cd "${ROOT}"
 
-echo "==> EnigmaOS ISO build (container)"
+echo "==> EnigmarsOS ISO build (container)"
 echo "    root:    ${ROOT}"
 echo "    profile: ${PROFILE}"
 echo "    work:    ${WORK}"
@@ -31,22 +31,22 @@ if ! grep -q '^\[multilib\]' /etc/pacman.conf; then
 fi
 
 # Ensure local AUR repo (calamares) is available to pacstrap via profile pacman.conf
-if [[ -d /opt/enigmaos-repo ]] && [[ -f /opt/enigmaos-repo/enigmaos-local.db || -f /opt/enigmaos-repo/enigmaos-local.db.tar.gz ]]; then
-  if ! grep -q '^\[enigmaos-local\]' "${PROFILE}/pacman.conf"; then
+if [[ -d /opt/enigmarsos-repo ]] && [[ -f /opt/enigmarsos-repo/enigmarsos-local.db || -f /opt/enigmarsos-repo/enigmarsos-local.db.tar.gz ]]; then
+  if ! grep -q '^\[enigmarsos-local\]' "${PROFILE}/pacman.conf"; then
     cat >>"${PROFILE}/pacman.conf" <<'EOF'
 
 # Calamares and other AUR packages prebuilt into the build image
-[enigmaos-local]
+[enigmarsos-local]
 SigLevel = Optional TrustAll
-Server = file:///opt/enigmaos-repo
+Server = file:///opt/enigmarsos-repo
 EOF
   fi
-  if ! grep -q '^\[enigmaos-local\]' /etc/pacman.conf; then
+  if ! grep -q '^\[enigmarsos-local\]' /etc/pacman.conf; then
     cat >>/etc/pacman.conf <<'EOF'
 
-[enigmaos-local]
+[enigmarsos-local]
 SigLevel = Optional TrustAll
-Server = file:///opt/enigmaos-repo
+Server = file:///opt/enigmarsos-repo
 EOF
   fi
 fi
@@ -76,12 +76,12 @@ rm -f "${PROFILE}/airootfs/etc/security/limits.d/10-gamemode.conf"
 
 
 # Re-apply local repo after prepare-profile (it may overwrite pacman.conf)
-if [[ -d /opt/enigmaos-repo ]] && ! grep -q '^\[enigmaos-local\]' "${PROFILE}/pacman.conf"; then
+if [[ -d /opt/enigmarsos-repo ]] && ! grep -q '^\[enigmarsos-local\]' "${PROFILE}/pacman.conf"; then
   cat >>"${PROFILE}/pacman.conf" <<'EOF'
 
-[enigmaos-local]
+[enigmarsos-local]
 SigLevel = Optional TrustAll
-Server = file:///opt/enigmaos-repo
+Server = file:///opt/enigmarsos-repo
 EOF
 fi
 
@@ -123,4 +123,4 @@ echo "==> checksums"
   fi
 )
 
-echo "==> EnigmaOS ISO build complete"
+echo "==> EnigmarsOS ISO build complete"

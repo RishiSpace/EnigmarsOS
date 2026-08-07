@@ -1,0 +1,19 @@
+# Maintainer: EnigmarsOS Team <rishi@rishispace.dev>
+pkgname=enigmarsos-artwork
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="EnigmarsOS logos, wallpapers and color schemes"
+arch=('any')
+url="https://enigmarsos.rishispace.dev"
+license=('GPL-3.0-or-later')
+source=()
+sha256sums=()
+
+package() {
+  install -d "$pkgdir/usr/share/enigmarsos/"{logos,wallpapers}
+  install -d "$pkgdir/usr/share/backgrounds/enigmarsos"
+  install -d "$pkgdir/usr/share/color-schemes"
+  install -d "$pkgdir/usr/share/pixmaps"
+  # Files copied by build script from branding/ and wallpapers/
+  echo "${pkgver}" > "$pkgdir/usr/share/enigmarsos/artwork-version"
+}

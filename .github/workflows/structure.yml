@@ -14,4 +14,4 @@ jobs:
       - name: Run structure check
         run: bash ./scripts/dev/sync-airootfs-check.sh
       - name: Branding URL
-        run: grep -q 'enigmaos.rishispace.dev' archiso/airootfs/usr/share/libalpm/scripts/enigmaos-os-release
+        run: grep -q 'enigmarsos.rishispace.dev' archiso/airootfs/usr/share/libalpm/scripts/enigmarsos-os-release

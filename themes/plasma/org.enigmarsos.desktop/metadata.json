@@ -1,0 +1,21 @@
+{
+    "KPackageStructure": "Plasma/LookAndFeel",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Email": "rishi@rishispace.dev",
+                "Name": "EnigmarsOS"
+            }
+        ],
+        "Category": "",
+        "Description": "EnigmarsOS AMOLED Plasma look and feel",
+        "Id": "org.enigmarsos.desktop",
+        "License": "GPL-3.0+",
+        "Name": "EnigmarsOS",
+        "Website": "https://enigmarsos.rishispace.dev",
+        "Version": "1.0.0"
+    },
+    "X-KDE-ParentApp": "",
+    "Keywords": "Desktop;Workspace;Appearance;Look and Feel;Logout;Lock;Suspend;Shutdown;Hibernate;",
+    "X-Plasma-APIVersion": "2"
+}

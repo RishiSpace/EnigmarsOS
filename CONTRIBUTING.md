@@ -1,4 +1,4 @@
-# Contributing to EnigmaOS
+# Contributing to EnigmarsOS
 
 Thank you for helping build a polished, privacy-first Arch-based OS.
 
@@ -7,7 +7,7 @@ Thank you for helping build a polished, privacy-first Arch-based OS.
 1. **Upstream first** — reuse Arch packages; avoid unnecessary forks.
 2. **Philosophy filter** — every change should improve privacy, security, UX, performance, simplicity or long-term maintainability.
 3. **No telemetry** — reject analytics, advertising and forced accounts.
-4. **Branding** — visible strings say EnigmaOS; logo is `public/EnigmaOS.png` only.
+4. **Branding** — visible strings say EnigmarsOS; logo is `public/EnigmarsOS.png` only.
 5. **No placeholders** — do not merge broken configs, TODOs-as-features or dead code.
 6. **Modular** — prefer packages under `packages/` over one-off hacks in airootfs.
 

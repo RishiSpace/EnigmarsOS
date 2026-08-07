@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-IMAGE_NAME="${ENIGMAOS_DOCKER_IMAGE:-enigmaos-iso-builder:latest}"
+IMAGE_NAME="${ENIGMARSOS_DOCKER_IMAGE:-enigmarsos-iso-builder:latest}"
 OUT_DIR="${ROOT}/out"
 WORK_DIR="${ROOT}/work"
 
@@ -21,11 +21,11 @@ fi
 echo "==> Preparing archiso profile"
 bash "${ROOT}/scripts/build/prepare-profile.sh"
 
-if [[ "${ENIGMAOS_SKIP_IMAGE_BUILD:-0}" != "1" ]]; then
+if [[ "${ENIGMARSOS_SKIP_IMAGE_BUILD:-0}" != "1" ]]; then
   echo "==> Building Docker image ${IMAGE_NAME}"
   docker build -t "${IMAGE_NAME}" "${ROOT}/docker"
 else
-  echo "==> Skipping image rebuild (ENIGMAOS_SKIP_IMAGE_BUILD=1)"
+  echo "==> Skipping image rebuild (ENIGMARSOS_SKIP_IMAGE_BUILD=1)"
 fi
 
 mkdir -p "${OUT_DIR}"
@@ -38,9 +38,9 @@ DOCKER_ARGS=(
   --privileged
   --security-opt apparmor=unconfined
   -e SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:-$(date +%s)}"
-  -e ENIGMAOS_ROOT=/build
+  -e ENIGMARSOS_ROOT=/build
   -v "${ROOT}:/build"
-  -v enigmaos-pkgcache:/var/cache/pacman/pkg
+  -v enigmarsos-pkgcache:/var/cache/pacman/pkg
   -w /build
   --tmpfs /tmp:rw,exec,nosuid,size=8g
 )

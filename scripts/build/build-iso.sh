@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build EnigmaOS ISO with mkarchiso
+# Build EnigmarsOS ISO with mkarchiso
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"

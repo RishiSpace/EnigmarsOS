@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=EnigmarsOS
+Description=EnigmarsOS AMOLED boot splash
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/enigmarsos
+ScriptFile=/usr/share/plymouth/themes/enigmarsos/enigmarsos.script

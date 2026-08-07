@@ -1,4 +1,4 @@
-# EnigmaOS Starship prompt — minimal, fast, cyan accent
+# EnigmarsOS Starship prompt — minimal, fast, cyan accent
 format = """
 $username\
 $hostname\

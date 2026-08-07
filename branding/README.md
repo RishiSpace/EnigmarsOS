@@ -1,8 +1,8 @@
 # Branding
 
-Canonical logo: **`../public/EnigmaOS.png`**
+Canonical logo: **`../public/EnigmarsOS.png`**
 
-Also mirrored as SVG: `logos/EnigmaOS.svg`
+Also mirrored as SVG: `logos/EnigmarsOS.svg`
 
 ## Palette
 

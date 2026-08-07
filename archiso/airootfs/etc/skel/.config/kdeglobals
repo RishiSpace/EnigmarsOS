@@ -1,6 +1,6 @@
 [General]
-ColorScheme=EnigmaOS
-Name=EnigmaOS
+ColorScheme=EnigmarsOS
+Name=EnigmarsOS
 fixed=JetBrainsMono Nerd Font,10,-1,5,50,0,0,0,0,0
 font=Inter,10,-1,5,50,0,0,0,0,0
 menuFont=Inter,10,-1,5,50,0,0,0,0,0
@@ -11,7 +11,7 @@ toolBarFont=Inter,10,-1,5,50,0,0,0,0,0
 Theme=Papirus-Dark
 
 [KDE]
-LookAndFeelPackage=org.enigmaos.desktop
+LookAndFeelPackage=org.enigmarsos.desktop
 SingleClick=false
 widgetStyle=Breeze
 

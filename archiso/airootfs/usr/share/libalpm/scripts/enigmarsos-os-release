@@ -1,0 +1,29 @@
+#!/bin/sh
+cat >/usr/lib/os-release <<'OS'
+NAME="EnigmarsOS"
+PRETTY_NAME="EnigmarsOS"
+ID=enigmarsos
+ID_LIKE=arch
+BUILD_ID=rolling
+ANSI_COLOR="0;36"
+HOME_URL="https://enigmarsos.rishispace.dev/"
+DOCUMENTATION_URL="https://enigmarsos.rishispace.dev/docs/"
+SUPPORT_URL="https://github.com/RishiSpace/EnigmarsOS/issues"
+BUG_REPORT_URL="https://github.com/RishiSpace/EnigmarsOS/issues"
+PRIVACY_POLICY_URL="https://enigmarsos.rishispace.dev/privacy"
+LOGO=enigmarsos
+OS
+rm -f /etc/os-release; cp -f /usr/lib/os-release /etc/os-release
+cat >/etc/motd <<'MOTD'
+Welcome to EnigmarsOS
+
+  Privacy first · Secure by default · Ready immediately
+
+  Docs:     https://enigmarsos.rishispace.dev/docs
+  Issues:   https://github.com/RishiSpace/EnigmarsOS/issues
+
+  Live tip: open "Install EnigmarsOS" or run:  sudo calamares
+
+MOTD
+printf 'EnigmarsOS \\r (\\l)\n\n' >/etc/issue
+echo enigmarsos >/etc/hostname

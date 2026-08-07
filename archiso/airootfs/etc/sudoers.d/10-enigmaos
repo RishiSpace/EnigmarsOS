@@ -1,6 +1,0 @@
-# EnigmaOS — wheel group may use sudo
-%wheel ALL=(ALL:ALL) ALL
-Defaults env_reset
-Defaults secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-Defaults timestamp_timeout=15
-Defaults !tty_tickets

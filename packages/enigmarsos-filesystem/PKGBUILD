@@ -1,0 +1,42 @@
+# Maintainer: EnigmarsOS Team <rishi@rishispace.dev>
+pkgname=enigmarsos-filesystem
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="EnigmarsOS base filesystem identity (os-release, issue, motd)"
+arch=('any')
+url="https://enigmarsos.rishispace.dev"
+license=('GPL-3.0-or-later')
+depends=('filesystem')
+provides=('enigmarsos-identity')
+conflicts=()
+source=()
+sha256sums=()
+
+package() {
+  install -Dm644 /dev/stdin "$pkgdir/usr/lib/os-release" <<'OS'
+NAME="EnigmarsOS"
+PRETTY_NAME="EnigmarsOS"
+ID=enigmarsos
+ID_LIKE=arch
+BUILD_ID=rolling
+ANSI_COLOR="0;36"
+HOME_URL="https://enigmarsos.rishispace.dev/"
+DOCUMENTATION_URL="https://enigmarsos.rishispace.dev/docs/"
+SUPPORT_URL="https://github.com/RishiSpace/EnigmarsOS/issues"
+BUG_REPORT_URL="https://github.com/RishiSpace/EnigmarsOS/issues"
+PRIVACY_POLICY_URL="https://enigmarsos.rishispace.dev/privacy"
+LOGO=enigmarsos
+OS
+  install -Dm644 /dev/stdin "$pkgdir/etc/issue" <<'ISSUE'
+EnigmarsOS \r (\l)
+
+ISSUE
+  install -Dm644 /dev/stdin "$pkgdir/etc/motd" <<'MOTD'
+Welcome to EnigmarsOS
+
+  Privacy first · Secure by default · Ready immediately
+
+  Docs:     https://enigmarsos.rishispace.dev/docs
+  Website:  https://enigmarsos.rishispace.dev
+MOTD
+}

@@ -1,7 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=Install EnigmaOS
-Exec=sudo -E calamares
-Icon=enigmaos
-Terminal=false
-Categories=System;

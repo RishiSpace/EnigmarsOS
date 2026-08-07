@@ -1,0 +1,13 @@
+[Unit]
+Description=Ensure EnigmarsOS system identity
+DefaultDependencies=no
+After=local-fs.target
+Before=display-manager.service multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/enigmarsos-branding
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

@@ -1,4 +1,4 @@
-# Maintainer: EnigmaOS builders
+# Maintainer: EnigmarsOS builders
 # Vendored build of Calamares for the ISO builder image (not in official Arch repos).
 pkgname=calamares
 pkgver=3.3.14

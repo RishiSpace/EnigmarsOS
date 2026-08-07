@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Force SDDM to use the stock Plasma Breeze greeter.
-# (Custom EnigmaOS SDDM theme is not used.)
+# (Custom EnigmarsOS SDDM theme is not used.)
 #
 # Usage:
 #   sudo bash repair-sddm-theme.sh            # fix running system
@@ -17,7 +17,7 @@ if [[ "$(id -u)" -ne 0 ]]; then
 fi
 
 mkdir -p "${CONF_D}"
-cat >"${CONF_D}/10-enigmaos.conf" <<'EOF'
+cat >"${CONF_D}/10-enigmarsos.conf" <<'EOF'
 [Theme]
 Current=breeze
 CursorTheme=breeze_cursors

@@ -18,11 +18,11 @@ jobs:
       - name: Run structure check
         run: bash ./scripts/dev/sync-airootfs-check.sh
       - name: Logo present
-        run: test -f public/EnigmaOS.png
+        run: test -f public/EnigmarsOS.png
       - name: Branding URL
         run: |
-          grep -q 'enigmaos.rishispace.dev' archiso/airootfs/usr/share/libalpm/scripts/enigmaos-os-release
-          grep -q 'enigmaos.rishispace.dev' profiledef.sh
+          grep -q 'enigmarsos.rishispace.dev' archiso/airootfs/usr/share/libalpm/scripts/enigmarsos-os-release
+          grep -q 'enigmarsos.rishispace.dev' profiledef.sh
 
   iso:
     name: Build ISO & publish release
@@ -44,7 +44,7 @@ jobs:
 
       - name: Build ISO via Docker
         env:
-          ENIGMAOS_SKIP_IMAGE_BUILD: "0"
+          ENIGMARSOS_SKIP_IMAGE_BUILD: "0"
         run: |
           # Full image build (includes Calamares) then mkarchiso
           ./scripts/build/docker-build-iso.sh
@@ -58,7 +58,7 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: enigmaos-iso
+          name: enigmarsos-iso
           path: |
             out/*.iso
             out/SHA256SUMS
@@ -69,7 +69,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          name: EnigmaOS ${{ github.ref_name }}
+          name: EnigmarsOS ${{ github.ref_name }}
           draft: false
           prerelease: ${{ contains(github.ref_name, 'rc') || contains(github.ref_name, 'alpha') || contains(github.ref_name, 'beta') }}
           generate_release_notes: true
@@ -77,9 +77,9 @@ jobs:
             out/*.iso
             out/SHA256SUMS
           body: |
-            ## EnigmaOS ${{ github.ref_name }}
+            ## EnigmarsOS ${{ github.ref_name }}
 
-            Official install medium for [EnigmaOS](https://enigmaos.rishispace.dev).
+            Official install medium for [EnigmarsOS](https://enigmarsos.rishispace.dev).
 
             ### Verify
             ```bash
@@ -97,7 +97,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: snapshot-${{ github.run_number }}
-          name: EnigmaOS snapshot #${{ github.run_number }}
+          name: EnigmarsOS snapshot #${{ github.run_number }}
           draft: false
           prerelease: true
           generate_release_notes: true
@@ -107,6 +107,6 @@ jobs:
           body: |
             Snapshot build from workflow_dispatch (run ${{ github.run_number }}).
 
-            Site: https://enigmaos.rishispace.dev
+            Site: https://enigmarsos.rishispace.dev
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Welcome to EnigmarsOS
+GenericName=Welcome
+Comment=EnigmarsOS welcome, updates, gaming and documentation
+Exec=enigmarsos-welcome
+Icon=enigmarsos
+Terminal=false
+Categories=System;Utility;
+Keywords=welcome;setup;enigma;update;gaming;
+StartupNotify=true
+X-KDE-autostart-after=panel

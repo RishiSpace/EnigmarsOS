@@ -1,4 +1,4 @@
-# Installing EnigmaOS
+# Installing EnigmarsOS
 
 ## Requirements
 
@@ -12,7 +12,7 @@
 
 ```bash
 # Linux
-sudo dd if=enigmaos-YYYY.MM.DD-x86_64.iso of=/dev/sdX bs=4M status=progress oflag=sync
+sudo dd if=enigmarsos-YYYY.MM.DD-x86_64.iso of=/dev/sdX bs=4M status=progress oflag=sync
 
 # Or use Ventoy / balenaEtcher / Fedora Media Writer
 ```
@@ -21,13 +21,13 @@ Verify checksums before writing:
 
 ```bash
 sha256sum -c SHA256SUMS
-gpg --verify enigmaos-*.iso.sig
+gpg --verify enigmarsos-*.iso.sig
 ```
 
 ## Installer (Calamares)
 
-1. Boot the USB and choose **EnigmaOS**.
-2. Launch **Install EnigmaOS** from the desktop (or run `sudo calamares`).
+1. Boot the USB and choose **EnigmarsOS**.
+2. Launch **Install EnigmarsOS** from the desktop (or run `sudo calamares`).
 3. Select language, region and keyboard.
 4. Partition:
    - **Erase disk** for a clean install (optionally enable LUKS).
@@ -39,7 +39,7 @@ gpg --verify enigmaos-*.iso.sig
 
 ## Post-install
 
-The **Welcome to EnigmaOS** app opens on first login:
+The **Welcome to EnigmarsOS** app opens on first login:
 
 - Update the system
 - Review gaming/driver status
@@ -61,7 +61,7 @@ fetch the kernel package set.
 
 Installed systems use **[Limine](https://github.com/Limine-Bootloader/Limine)**:
 
-- UEFI: `EFI/EnigmaOS/BOOTX64.EFI` (+ fallback `EFI/BOOT/BOOTX64.EFI`)
+- UEFI: `EFI/EnigmarsOS/BOOTX64.EFI` (+ fallback `EFI/BOOT/BOOTX64.EFI`)
 - BIOS: `limine bios-install` on the target disk + `limine-bios.sys`
 - Config: `/boot/limine.conf` (also mirrored on the ESP when separate)
 

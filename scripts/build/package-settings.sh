@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-DEST="${ROOT}/packages/enigmaos-settings/files"
+DEST="${ROOT}/packages/enigmarsos-settings/files"
 rm -rf "$DEST"
 mkdir -p "$DEST"
 

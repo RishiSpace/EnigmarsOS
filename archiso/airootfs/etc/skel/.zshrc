@@ -1,4 +1,4 @@
-# EnigmaOS default zsh configuration
+# EnigmarsOS default zsh configuration
 export EDITOR=nvim
 export VISUAL=nvim
 export PAGER=less

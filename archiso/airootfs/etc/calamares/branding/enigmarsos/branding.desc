@@ -1,0 +1,36 @@
+---
+componentName:  enigmarsos
+welcomeStyleCalamares:   true
+welcomeExpandingLogo:    true
+windowExpanding:         normal
+windowSize:              1000px,680px
+windowPlacement:         center
+
+strings:
+    productName:         EnigmarsOS
+    shortProductName:    EnigmarsOS
+    version:             Rolling
+    shortVersion:        rolling
+    versionedName:       EnigmarsOS Rolling
+    shortVersionedName:  EnigmarsOS
+    bootloaderEntryName: EnigmarsOS
+    productUrl:          https://enigmarsos.rishispace.dev
+    supportUrl:          https://enigmarsos.rishispace.dev/docs
+    knownIssuesUrl:      https://github.com/RishiSpace/EnigmarsOS/issues
+    releaseNotesUrl:     https://enigmarsos.rishispace.dev/changelog
+    donateUrl:           https://enigmarsos.rishispace.dev/donate
+
+images:
+    productLogo:         "logo.png"
+    productIcon:         "logo.png"
+    productWelcome:      "welcome.png"
+    productWallpaper:    "wallpaper.png"
+
+slideshow:               "show.qml"
+slideshowAPI:            2
+
+style:
+   sidebarBackground:    "#000000"
+   sidebarText:          "#FFFFFF"
+   sidebarTextSelect:    "#00E5FF"
+   sidebarTextHighlight: "#7B2FFF"

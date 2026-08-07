@@ -8,4 +8,4 @@ plugin=org.kde.plasma.folder
 wallpaperplugin=org.kde.image
 
 [Containments][1][Wallpaper][org.kde.image][General]
-Image=file:///usr/share/enigmaos/wallpapers/enigmaos-amoled.png
+Image=file:///usr/share/enigmarsos/wallpapers/enigmarsos-amoled.png

@@ -1,0 +1,18 @@
+# Maintainer: EnigmarsOS Team <rishi@rishispace.dev>
+pkgname=enigmarsos-settings
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="EnigmarsOS default settings (security, Plasma, shell, NetworkManager)"
+arch=('any')
+url="https://enigmarsos.rishispace.dev"
+license=('GPL-3.0-or-later')
+depends=('enigmarsos-filesystem')
+source=()
+sha256sums=()
+
+package() {
+  # Packaged from repo configs at build time by scripts/package-settings.sh
+  # This PKGBUILD is a template; release script injects files.
+  install -d "$pkgdir/usr/share/enigmarsos/settings"
+  echo "EnigmarsOS settings package ${pkgver}" > "$pkgdir/usr/share/enigmarsos/settings/VERSION"
+}

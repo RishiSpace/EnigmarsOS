@@ -8,14 +8,14 @@ if [[ $# -lt 1 ]]; then
   exit 1
 fi
 
-KEY="${ENIGMAOS_GPG_KEY:-}"
+KEY="${ENIGMARSOS_GPG_KEY:-}"
 for iso in "$@"; do
   [[ -f "$iso" ]] || { echo "Missing $iso" >&2; exit 1; }
   sha256sum "$iso" | tee "${iso}.sha256"
   if [[ -n "$KEY" ]]; then
     gpg --batch --yes --detach-sign -u "$KEY" "$iso"
   else
-    echo "ENIGMAOS_GPG_KEY not set; skipped gpg signature for $iso" >&2
+    echo "ENIGMARSOS_GPG_KEY not set; skipped gpg signature for $iso" >&2
   fi
 done
 

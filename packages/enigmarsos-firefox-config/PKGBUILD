@@ -1,0 +1,16 @@
+# Maintainer: EnigmarsOS Team <rishi@rishispace.dev>
+pkgname=enigmarsos-firefox-config
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="Privacy-hardened Firefox defaults for EnigmarsOS"
+arch=('any')
+url="https://enigmarsos.rishispace.dev"
+license=('GPL-3.0-or-later')
+depends=('firefox')
+source=('policies.json')
+sha256sums=('SKIP')
+
+package() {
+  install -Dm644 policies.json \
+    "$pkgdir/etc/firefox/policies/policies.json"
+}

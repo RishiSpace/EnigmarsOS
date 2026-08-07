@@ -1,8 +1,8 @@
-# EnigmaOS
+# EnigmarsOS
 
 **Privacy first · Secure by default · Ready immediately**
 
-EnigmaOS is a production-minded Linux distribution based on Arch Linux with KDE Plasma 6. It is **not** a casual remaster: the repository is structured for long-term packaging, branded install media, reproducible ISO builds and a coherent desktop experience.
+EnigmarsOS is a production-minded Linux distribution based on Arch Linux with KDE Plasma 6. It is **not** a casual remaster: the repository is structured for long-term packaging, branded install media, reproducible ISO builds and a coherent desktop experience.
 
 > Stay as close to upstream Arch as reasonably possible. Customize only where it improves UX, security, privacy, performance or branding.
 
@@ -18,7 +18,7 @@ EnigmaOS is a production-minded Linux distribution based on Arch Linux with KDE 
 ## Repository layout
 
 ```
-EnigmaOS/
+EnigmarsOS/
 ├── archiso/           # mkarchiso profile (airootfs, boot loaders)
 ├── packages/          # Custom PKGBUILDs (welcome, artwork, settings, …)
 ├── branding/          # Logos and brand assets
@@ -30,7 +30,7 @@ EnigmaOS/
 ├── scripts/           # Build, release and developer tooling
 ├── docs/              # End-user documentation
 ├── docker/            # Arch container image for ISO builds
-├── public/EnigmaOS.png
+├── public/EnigmarsOS.png
 ├── packages.x86_64    # ISO package list
 ├── profiledef.sh      # ISO identity
 └── README.md
@@ -65,22 +65,22 @@ sudo ./scripts/build/build-iso.sh
 ### Sign release artifacts
 
 ```bash
-export ENIGMAOS_GPG_KEY=YOUR_KEY_ID
-./scripts/release/sign-iso.sh out/enigmaos-*.iso
+export ENIGMARSOS_GPG_KEY=YOUR_KEY_ID
+./scripts/release/sign-iso.sh out/enigmarsos-*.iso
 ```
 
 ## Custom packages
 
 | Package | Role |
 |---------|------|
-| `enigmaos-filesystem` | `os-release`, issue, motd |
-| `enigmaos-settings` | Secure defaults, Plasma skel |
-| `enigmaos-artwork` | Logos, wallpapers, colors |
-| `enigmaos-welcome` | Welcome application |
-| `enigmaos-calamares-config` | Installer branding |
-| `enigmaos-firefox-config` | Privacy policies + uBlock |
-| `enigmaos-hooks` | pacman hooks |
-| `enigmaos-keyring` | Package signing keyring |
+| `enigmarsos-filesystem` | `os-release`, issue, motd |
+| `enigmarsos-settings` | Secure defaults, Plasma skel |
+| `enigmarsos-artwork` | Logos, wallpapers, colors |
+| `enigmarsos-welcome` | Welcome application |
+| `enigmarsos-calamares-config` | Installer branding |
+| `enigmarsos-firefox-config` | Privacy policies + uBlock |
+| `enigmarsos-hooks` | pacman hooks |
+| `enigmarsos-keyring` | Package signing keyring |
 
 ## Live session
 
@@ -89,7 +89,7 @@ export ENIGMAOS_GPG_KEY=YOUR_KEY_ID
 | User | `live` / `live` |
 | Desktop | Plasma 6 (Wayland) |
 | Installer | Calamares (`sudo calamares`) |
-| Branding | EnigmaOS (no visible Arch labels) |
+| Branding | EnigmarsOS (no visible Arch labels) |
 
 ## Documentation
 
@@ -100,14 +100,14 @@ See [`docs/`](docs/README.md) for installation, gaming, development, virtualizat
 1. Keep changes modular and documented.  
 2. Prefer upstream packages over forks.  
 3. Never reintroduce telemetry or insecure defaults.  
-4. Preserve branding consistency (logo: `public/EnigmaOS.png`).  
+4. Preserve branding consistency (logo: `public/EnigmarsOS.png`).  
 5. Run `./scripts/dev/sync-airootfs-check.sh` before opening a PR.
 
 ## License
 
-GPL-3.0-or-later for EnigmaOS-specific packaging, branding integration and tooling. Upstream components retain their own licenses. Arch Linux is a trademark of Aaron Griffin and Judd Vinet; EnigmaOS is an independent project and is not affiliated with Arch Linux.
+GPL-3.0-or-later for EnigmarsOS-specific packaging, branding integration and tooling. Upstream components retain their own licenses. Arch Linux is a trademark of Aaron Griffin and Judd Vinet; EnigmarsOS is an independent project and is not affiliated with Arch Linux.
 
 ## Links
 
-- Docs: https://enigmaos.rishispace.dev/docs  
-- Issues: https://github.com/RishiSpace/EnigmaOS/issues  
+- Docs: https://enigmarsos.rishispace.dev/docs  
+- Issues: https://github.com/RishiSpace/EnigmarsOS/issues  

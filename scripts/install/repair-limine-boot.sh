@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Repair an already-installed EnigmaOS system whose Limine menu fails with:
+# Repair an already-installed EnigmarsOS system whose Limine menu fails with:
 #   "Failed to open kernel with path" / wrong uuid:UUID:/@/boot/... paths
 #
 # Root cause: Limine can only *read* FAT (and ISO9660). Kernels on btrfs must
 # be copied to the ESP, and paths must use boot():/... or uuid(UUID):/...
 #
-# Run from the EnigmaOS (or Arch) live USB as root. No ISO rebuild required.
+# Run from the EnigmarsOS (or Arch) live USB as root. No ISO rebuild required.
 #
 # Usage:
 #   sudo bash repair-limine-boot.sh
@@ -22,7 +22,7 @@ fi
 ROOT_PART="${1:-}"
 ESP_PART="${2:-}"
 
-echo "==> EnigmaOS: repair Limine boot (stage kernels onto ESP)"
+echo "==> EnigmarsOS: repair Limine boot (stage kernels onto ESP)"
 
 if [[ -z "${ROOT_PART}" || -z "${ESP_PART}" ]]; then
   echo "    Detecting partitions (lsblk)..."
@@ -90,7 +90,7 @@ fi
 [[ -r "${MNT}/boot/vmlinuz-linux" ]] || die "no ${MNT}/boot/vmlinuz-linux — install incomplete?"
 [[ -r "${MNT}/boot/initramfs-linux.img" ]] || die "no initramfs-linux.img"
 
-STAGE="${MNT}/boot/efi/EFI/EnigmaOS"
+STAGE="${MNT}/boot/efi/EFI/EnigmarsOS"
 mkdir -p "${STAGE}" "${MNT}/boot/efi/EFI/BOOT"
 
 echo "    Copying kernel + initramfs to ESP..."
@@ -132,34 +132,34 @@ if [[ -r "${MNT}/etc/fstab" ]]; then
 fi
 
 UCODE_LINES=""
-[[ -f "${STAGE}/intel-ucode.img" ]] && UCODE_LINES+="    module_path: boot():/EFI/EnigmaOS/intel-ucode.img"$'\n'
-[[ -f "${STAGE}/amd-ucode.img" ]] && UCODE_LINES+="    module_path: boot():/EFI/EnigmaOS/amd-ucode.img"$'\n'
+[[ -f "${STAGE}/intel-ucode.img" ]] && UCODE_LINES+="    module_path: boot():/EFI/EnigmarsOS/intel-ucode.img"$'\n'
+[[ -f "${STAGE}/amd-ucode.img" ]] && UCODE_LINES+="    module_path: boot():/EFI/EnigmarsOS/amd-ucode.img"$'\n'
 
-FALLBACK_MODULE="boot():/EFI/EnigmaOS/initramfs-linux.img"
+FALLBACK_MODULE="boot():/EFI/EnigmarsOS/initramfs-linux.img"
 [[ -f "${STAGE}/initramfs-linux-fallback.img" ]] && \
-  FALLBACK_MODULE="boot():/EFI/EnigmaOS/initramfs-linux-fallback.img"
+  FALLBACK_MODULE="boot():/EFI/EnigmarsOS/initramfs-linux-fallback.img"
 
 write_conf() {
   local dest="$1"
   cat >"${dest}" <<EOF
-# EnigmaOS Limine configuration (repaired)
+# EnigmarsOS Limine configuration (repaired)
 # Kernels staged on ESP — Limine cannot read btrfs/ext4.
 timeout: 5
 default_entry: 1
-interface_branding: EnigmaOS
+interface_branding: EnigmarsOS
 interface_branding_colour: 6
 term_background: 000000
 
-/+EnigmaOS
-//EnigmaOS
+/+EnigmarsOS
+//EnigmarsOS
     protocol: linux
-    path: boot():/EFI/EnigmaOS/vmlinuz-linux
-${UCODE_LINES}    module_path: boot():/EFI/EnigmaOS/initramfs-linux.img
+    path: boot():/EFI/EnigmarsOS/vmlinuz-linux
+${UCODE_LINES}    module_path: boot():/EFI/EnigmarsOS/initramfs-linux.img
     cmdline: ${CMDLINE}
 
-//EnigmaOS (fallback initramfs)
+//EnigmarsOS (fallback initramfs)
     protocol: linux
-    path: boot():/EFI/EnigmaOS/vmlinuz-linux
+    path: boot():/EFI/EnigmarsOS/vmlinuz-linux
 ${UCODE_LINES}    module_path: ${FALLBACK_MODULE}
     cmdline: ${CMDLINE}
 
@@ -174,7 +174,7 @@ EOF
 
 write_conf "${MNT}/boot/efi/limine.conf"
 write_conf "${MNT}/boot/efi/EFI/BOOT/limine.conf"
-write_conf "${MNT}/boot/efi/EFI/EnigmaOS/limine.conf"
+write_conf "${MNT}/boot/efi/EFI/EnigmarsOS/limine.conf"
 
 sync
 echo
@@ -183,5 +183,5 @@ echo "    Staged files:"
 ls -lh "${STAGE}"
 echo
 echo "    cmdline: ${CMDLINE}"
-echo "    Reboot (remove live USB) and select EnigmaOS / EFI boot."
-echo "    If firmware does not list EnigmaOS, pick the disk's UEFI entry."
+echo "    Reboot (remove live USB) and select EnigmarsOS / EFI boot."
+echo "    If firmware does not list EnigmarsOS, pick the disk's UEFI entry."

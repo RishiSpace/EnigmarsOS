@@ -1,10 +1,10 @@
-# EnigmaOS top-level Makefile
+# EnigmarsOS top-level Makefile
 .PHONY: help prepare check iso iso-docker clean package-list
 
 ROOT := $(abspath .)
 
 help:
-	@echo "EnigmaOS targets:"
+	@echo "EnigmarsOS targets:"
 	@echo "  make prepare     - sync branding into archiso profile"
 	@echo "  make check       - validate repository structure"
 	@echo "  make iso-docker  - build ISO via Arch Docker container (recommended)"

@@ -28,7 +28,7 @@ See [Recovery](../recovery/README.md).
 Usually the `packages` job tried a **critical** `pacman -S` (e.g. reinstall
 `linux`) inside the target without a working network/keyring/mirrors.
 
-EnigmaOS install flow is offline-safe:
+EnigmarsOS install flow is offline-safe:
 
 1. `seed-kernel` copies `vmlinuz-linux` from the live session into the target
 2. `packages` only **try_remove**s live-only packages (failures ignored)

@@ -1,0 +1,11 @@
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = filesystem
+Target = enigmarsos-filesystem
+
+[Action]
+Description = Ensuring EnigmarsOS os-release identity...
+When = PostTransaction
+Exec = /usr/bin/true

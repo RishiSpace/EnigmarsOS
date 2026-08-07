@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Install EnigmarsOS
+Exec=sudo -E calamares
+Icon=enigmarsos
+Terminal=false
+Categories=System;

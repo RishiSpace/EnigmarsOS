@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to EnigmaOS will be documented here.
+All notable changes to EnigmarsOS will be documented here.
 
 ## [1.0.0-rolling] — 2026-03-28
 
@@ -10,7 +10,7 @@ All notable changes to EnigmaOS will be documented here.
 - AMOLED visual identity (cyan/purple on pure black)
 - Privacy-hardened Firefox enterprise policies + skel user.js
 - Secure defaults: UFW, AppArmor, sysctl, MAC randomization
-- Welcome application (`enigmaos-welcome`)
+- Welcome application (`enigmarsos-welcome`)
 - Plasma 6 / SDDM / Plymouth branding
 - Documentation set under `docs/`
 - GitHub Actions for structure checks and ISO builds

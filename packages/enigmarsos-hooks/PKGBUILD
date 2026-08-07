@@ -1,0 +1,15 @@
+# Maintainer: EnigmarsOS Team <rishi@rishispace.dev>
+pkgname=enigmarsos-hooks
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="pacman hooks for EnigmarsOS branding and maintenance"
+arch=('any')
+url="https://enigmarsos.rishispace.dev"
+license=('GPL-3.0-or-later')
+source=('enigmarsos-os-release.hook')
+sha256sums=('SKIP')
+
+package() {
+  install -Dm644 enigmarsos-os-release.hook \
+    "$pkgdir/usr/share/libalpm/hooks/enigmarsos-os-release.hook"
+}

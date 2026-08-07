@@ -3,13 +3,13 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 AIO="${ROOT}/archiso/airootfs"
 
-echo "==> Syncing EnigmaOS branding into airootfs"
+echo "==> Syncing EnigmarsOS branding into airootfs"
 
-install -Dm644 "${ROOT}/public/EnigmaOS.png" "${AIO}/usr/share/enigmaos/logos/EnigmaOS.png"
-install -Dm644 "${ROOT}/public/EnigmaOS.png" "${AIO}/usr/share/pixmaps/enigmaos.png"
-if [[ -f "${ROOT}/wallpapers/enigmaos-amoled.png" ]]; then
-  install -Dm644 "${ROOT}/wallpapers/enigmaos-amoled.png" \
-    "${AIO}/usr/share/enigmaos/wallpapers/enigmaos-amoled.png"
+install -Dm644 "${ROOT}/public/EnigmarsOS.png" "${AIO}/usr/share/enigmarsos/logos/EnigmarsOS.png"
+install -Dm644 "${ROOT}/public/EnigmarsOS.png" "${AIO}/usr/share/pixmaps/enigmarsos.png"
+if [[ -f "${ROOT}/wallpapers/enigmarsos-amoled.png" ]]; then
+  install -Dm644 "${ROOT}/wallpapers/enigmarsos-amoled.png" \
+    "${AIO}/usr/share/enigmarsos/wallpapers/enigmarsos-amoled.png"
 fi
 
 if [[ -d "${ROOT}/calamares" ]]; then
@@ -20,18 +20,18 @@ if [[ -d "${ROOT}/calamares" ]]; then
 fi
 
 # Custom SDDM theme is not shipped; greeter uses stock Breeze (see etc/sddm.conf*).
-rm -rf "${AIO}/usr/share/sddm/themes/enigmaos"
+rm -rf "${AIO}/usr/share/sddm/themes/enigmarsos"
 
-if [[ -d "${ROOT}/plymouth/enigmaos" ]]; then
+if [[ -d "${ROOT}/plymouth/enigmarsos" ]]; then
   mkdir -p "${AIO}/usr/share/plymouth/themes"
-  cp -a "${ROOT}/plymouth/enigmaos" "${AIO}/usr/share/plymouth/themes/"
+  cp -a "${ROOT}/plymouth/enigmarsos" "${AIO}/usr/share/plymouth/themes/"
 fi
 
-if [[ -f "${ROOT}/packages/enigmaos-welcome/enigmaos-welcome" ]]; then
-  install -Dm755 "${ROOT}/packages/enigmaos-welcome/enigmaos-welcome" \
-    "${AIO}/usr/local/bin/enigmaos-welcome"
-  install -Dm644 "${ROOT}/packages/enigmaos-welcome/enigmaos-welcome.desktop" \
-    "${AIO}/usr/share/applications/enigmaos-welcome.desktop"
+if [[ -f "${ROOT}/packages/enigmarsos-welcome/enigmarsos-welcome" ]]; then
+  install -Dm755 "${ROOT}/packages/enigmarsos-welcome/enigmarsos-welcome" \
+    "${AIO}/usr/local/bin/enigmarsos-welcome"
+  install -Dm644 "${ROOT}/packages/enigmarsos-welcome/enigmarsos-welcome.desktop" \
+    "${AIO}/usr/share/applications/enigmarsos-welcome.desktop"
 fi
 
 # Keep package list + identity in sync
@@ -39,7 +39,7 @@ cp -f "${ROOT}/packages.x86_64" "${ROOT}/archiso/packages.x86_64"
 cp -f "${ROOT}/profiledef.sh" "${ROOT}/archiso/profiledef.sh"
 chmod +x "${ROOT}/archiso/profiledef.sh"
 
-# Identity applied via pacman hook enigmaos-os-release (avoids filesystem package conflict)
+# Identity applied via pacman hook enigmarsos-os-release (avoids filesystem package conflict)
 
 echo "==> Profile prepared"
 

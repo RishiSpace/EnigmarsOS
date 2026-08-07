@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Report a problem in EnigmaOS
+about: Report a problem in EnigmarsOS
 title: "[bug] "
 labels: bug
 assignees: ''
@@ -9,7 +9,7 @@ assignees: ''
 **Describe the bug**
 A clear description of what went wrong.
 
-**EnigmaOS version / ISO**
+**EnigmarsOS version / ISO**
 - ISO date or package versions:
 
 **Hardware (if relevant)**

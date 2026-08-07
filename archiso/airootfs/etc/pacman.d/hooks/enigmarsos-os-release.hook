@@ -1,0 +1,10 @@
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = base
+
+[Action]
+Description = Applying EnigmarsOS os-release branding...
+When = PostTransaction
+Exec = /usr/share/libalpm/scripts/enigmarsos-os-release

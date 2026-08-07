@@ -10,7 +10,7 @@ assignees: ''
 What is missing or painful today?
 
 **Proposal**
-How should EnigmaOS behave?
+How should EnigmarsOS behave?
 
 **Philosophy check**
 Does this improve privacy, security, UX, performance, simplicity or maintainability?

@@ -1,0 +1,26 @@
+# Maintainer: EnigmarsOS Team <rishi@rishispace.dev>
+pkgname=enigmarsos-welcome
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="EnigmarsOS welcome application"
+arch=('any')
+url="https://enigmarsos.rishispace.dev"
+license=('GPL-3.0-or-later')
+depends=('python' 'pyside6' 'qt6-base')
+optdepends=(
+  'konsole: terminal for system updates'
+  'plasma-discover: software center integration'
+)
+source=(
+  'enigmarsos-welcome'
+  'enigmarsos-welcome.desktop'
+)
+sha256sums=('SKIP' 'SKIP')
+
+package() {
+  install -Dm755 enigmarsos-welcome "$pkgdir/usr/bin/enigmarsos-welcome"
+  install -Dm644 enigmarsos-welcome.desktop \
+    "$pkgdir/usr/share/applications/enigmarsos-welcome.desktop"
+  install -Dm644 enigmarsos-welcome.desktop \
+    "$pkgdir/etc/xdg/autostart/enigmarsos-welcome.desktop"
+}
