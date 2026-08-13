@@ -71,16 +71,8 @@ jobs:
           cat SHA256SUMS
           ls -lh
 
-      # Checksums only — ISO is ~5GB and exceeds GitHub Release (2GiB) limits;
-      # distribution is via SourceForge below.
-      - name: Upload checksum artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: enigmarsos-iso-checksums
-          path: out/SHA256SUMS
-          if-no-files-found: error
-          retention-days: 30
-
+      # ISO is only published to SourceForge (not GitHub Releases/artifacts;
+      # release assets cap at 2GiB and the image is ~5GB).
       - name: Upload ISO to SourceForge
         env:
           SOURCEFORGE_SFTP: ${{ secrets.SOURCEFORGE_SFTP }}
