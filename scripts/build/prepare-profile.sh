@@ -7,9 +7,48 @@ echo "==> Syncing EnigmarsOS branding into airootfs"
 
 install -Dm644 "${ROOT}/public/EnigmarsOS.png" "${AIO}/usr/share/enigmarsos/logos/EnigmarsOS.png"
 install -Dm644 "${ROOT}/public/EnigmarsOS.png" "${AIO}/usr/share/pixmaps/enigmarsos.png"
+if [[ -f "${ROOT}/public/EnigmarsOS.svg" ]]; then
+  install -Dm644 "${ROOT}/public/EnigmarsOS.svg" "${AIO}/usr/share/enigmarsos/logos/EnigmarsOS.svg"
+fi
 if [[ -f "${ROOT}/wallpapers/enigmarsos-amoled.png" ]]; then
   install -Dm644 "${ROOT}/wallpapers/enigmarsos-amoled.png" \
     "${AIO}/usr/share/enigmarsos/wallpapers/enigmarsos-amoled.png"
+fi
+
+# Kickoff / Application Launcher logo: thin icon theme overriding start-here-kde
+# (inherits Papirus-Dark). Also seed hicolor so Icon=enigmarsos desktop files work.
+if [[ -d "${ROOT}/themes/icons/EnigmarsOS" ]]; then
+  rm -rf "${AIO}/usr/share/icons/EnigmarsOS"
+  mkdir -p "${AIO}/usr/share/icons"
+  cp -a "${ROOT}/themes/icons/EnigmarsOS" "${AIO}/usr/share/icons/EnigmarsOS"
+  # hicolor brand + start-menu fallbacks (used when theme search falls through)
+  for size in 16 22 24 32 48; do
+    src="${ROOT}/themes/icons/EnigmarsOS/${size}x${size}/apps/enigmarsos.png"
+    if [[ -f "${src}" ]]; then
+      install -Dm644 "${src}" \
+        "${AIO}/usr/share/icons/hicolor/${size}x${size}/apps/enigmarsos.png"
+      install -Dm644 "${src}" \
+        "${AIO}/usr/share/icons/hicolor/${size}x${size}/apps/start-here-kde.png"
+      install -Dm644 "${src}" \
+        "${AIO}/usr/share/icons/hicolor/${size}x${size}/places/start-here-kde.png"
+    fi
+  done
+  if [[ -f "${ROOT}/public/EnigmarsOS.svg" ]]; then
+    install -Dm644 "${ROOT}/public/EnigmarsOS.svg" \
+      "${AIO}/usr/share/icons/hicolor/scalable/apps/enigmarsos.svg"
+    install -Dm644 "${ROOT}/public/EnigmarsOS.svg" \
+      "${AIO}/usr/share/icons/hicolor/scalable/apps/start-here-kde.svg"
+    install -Dm644 "${ROOT}/public/EnigmarsOS.svg" \
+      "${AIO}/usr/share/icons/hicolor/scalable/places/start-here-kde.svg"
+  fi
+fi
+
+# Look-and-feel package (keeps airootfs in sync with themes/)
+if [[ -d "${ROOT}/themes/plasma/org.enigmarsos.desktop" ]]; then
+  rm -rf "${AIO}/usr/share/plasma/look-and-feel/org.enigmarsos.desktop"
+  mkdir -p "${AIO}/usr/share/plasma/look-and-feel"
+  cp -a "${ROOT}/themes/plasma/org.enigmarsos.desktop" \
+    "${AIO}/usr/share/plasma/look-and-feel/org.enigmarsos.desktop"
 fi
 
 if [[ -d "${ROOT}/calamares" ]]; then

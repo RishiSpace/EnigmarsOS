@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="EnigmarsOS">
+  <rect width="512" height="512" rx="96" fill="#000000"/>
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00E5FF"/>
+      <stop offset="100%" stop-color="#7B2FFF"/>
+    </linearGradient>
+  </defs>
+  <!-- Stylized E / rotor mark -->
+  <g fill="none" stroke="url(#g)" stroke-width="28" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M150 140 H340"/>
+    <path d="M150 256 H300"/>
+    <path d="M150 372 H340"/>
+    <path d="M150 140 V372"/>
+    <circle cx="360" cy="256" r="52"/>
+    <path d="M360 204 V180"/>
+    <path d="M360 308 V332"/>
+  </g>
+</svg>

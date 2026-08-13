@@ -1,0 +1,10 @@
+[General]
+ColorScheme=EnigmarsOS
+Name=EnigmarsOS
+
+[Icons]
+Theme=EnigmarsOS
+
+[KDE]
+LookAndFeelPackage=org.enigmarsos.desktop
+widgetStyle=Breeze

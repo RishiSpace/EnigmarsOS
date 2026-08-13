@@ -8,7 +8,7 @@ smallestReadableFont=Inter,8,-1,5,50,0,0,0,0,0
 toolBarFont=Inter,10,-1,5,50,0,0,0,0,0
 
 [Icons]
-Theme=Papirus-Dark
+Theme=EnigmarsOS
 
 [KDE]
 LookAndFeelPackage=org.enigmarsos.desktop

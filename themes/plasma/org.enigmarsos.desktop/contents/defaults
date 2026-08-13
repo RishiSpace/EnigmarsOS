@@ -6,7 +6,7 @@ ColorScheme=EnigmarsOS
 Name=EnigmarsOS
 
 [kdeglobals][Icons]
-Theme=Papirus-Dark
+Theme=EnigmarsOS
 
 [plasmarc][Theme]
 name=default
