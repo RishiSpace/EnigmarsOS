@@ -46,3 +46,27 @@ The **Welcome to EnigmarsOS** app opens on first login:
 - Open documentation and community links
 
 Flatpak Flathub is preconfigured. Firmware updates appear in Discover when `fwupd` detects devices.
+
+## Installer notes
+
+If an older ISO fails at **mkinitcpio** with
+`/boot/vmlinuz-linux must be readable`, that image still used the live
+archiso initramfs preset. Current ISOs reinstall `linux` on the target and
+rewrite the preset before generating initramfs.
+
+The installed system needs network access during install so `pacman` can
+fetch the kernel package set.
+
+## Bootloader
+
+Installed systems use **[Limine](https://github.com/Limine-Bootloader/Limine)**:
+
+- UEFI: `EFI/EnigmarsOS/BOOTX64.EFI` (+ fallback `EFI/BOOT/BOOTX64.EFI`)
+- BIOS: `limine bios-install` on the target disk + `limine-bios.sys`
+- Config: `limine.conf` on the ESP (also under `EFI/EnigmarsOS/`)
+- Kernels are **staged onto the ESP** (`EFI/EnigmarsOS/vmlinuz-*`) because Limine
+  cannot read btrfs. A pacman hook runs `sync-esp-boot.sh` after every
+  `linux` / initramfs update so the ESP never keeps a stale kernel.
+
+The live USB still boots with Syslinux (BIOS) / systemd-boot (UEFI) because
+`mkarchiso` does not provide Limine bootmodes; only the **installed** OS uses Limine.

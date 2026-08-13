@@ -1,0 +1,30 @@
+# Stage kernels onto the ESP so Limine boots the same version pacman installed.
+# Without this, linux upgrades leave a stale kernel on the ESP and the next boot
+# loses modules (vfat) → Failed to mount /boot/efi → emergency mode.
+
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = linux
+Target = linux-lts
+Target = linux-zen
+Target = linux-hardened
+Target = linux-rt
+Target = linux-rt-lts
+Target = linux-headers
+Target = linux-lts-headers
+Target = linux-zen-headers
+Target = linux-hardened-headers
+Target = amd-ucode
+Target = intel-ucode
+Target = limine
+Target = mkinitcpio
+
+[Action]
+Description = Staging kernel/initramfs onto ESP for Limine...
+When = PostTransaction
+Depends = bash
+Depends = coreutils
+Depends = util-linux
+Exec = /usr/share/libalpm/scripts/enigmarsos-sync-esp

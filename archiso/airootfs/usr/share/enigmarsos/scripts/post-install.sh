@@ -74,4 +74,9 @@ if command -v reflector >/dev/null 2>&1; then
   reflector --protocol https --latest 15 --sort rate --save /etc/pacman.d/mirrorlist || true
 fi
 
+# Ensure ESP has the same kernel as /boot (idempotent with install-limine)
+if [[ -x /usr/share/enigmarsos/scripts/sync-esp-boot.sh ]]; then
+  /usr/share/enigmarsos/scripts/sync-esp-boot.sh || true
+fi
+
 echo "EnigmarsOS post-install complete."

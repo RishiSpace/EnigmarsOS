@@ -93,6 +93,17 @@ fi
 STAGE="${MNT}/boot/efi/EFI/EnigmarsOS"
 mkdir -p "${STAGE}" "${MNT}/boot/efi/EFI/BOOT"
 
+# Prefer the packaged sync helper when present on the installed system
+if [[ -x "${MNT}/usr/share/enigmarsos/scripts/sync-esp-boot.sh" ]]; then
+  echo "    Running target sync-esp-boot.sh via chroot..."
+  # ESP already mounted at ${MNT}/boot/efi
+  if arch-chroot "${MNT}" /usr/share/enigmarsos/scripts/sync-esp-boot.sh; then
+    echo "==> EnigmarsOS: repair done via sync-esp-boot"
+    exit 0
+  fi
+  echo "WARNING: sync-esp-boot failed; falling back to manual copy" >&2
+fi
+
 echo "    Copying kernel + initramfs to ESP..."
 cp -a "${MNT}/boot/vmlinuz-linux" "${STAGE}/vmlinuz-linux"
 cp -a "${MNT}/boot/initramfs-linux.img" "${STAGE}/initramfs-linux.img"
