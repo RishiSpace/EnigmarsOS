@@ -155,14 +155,31 @@ jobs:
           fi
 
           ISO_NAME="$(basename "${ISO}")"
-          echo "Uploading ${ISO_NAME} ($(du -h "${ISO}" | awk '{print $1}')) to SourceForge project enigmaos"
+
+          # SOURCEFORGE_SFTP may be "user", "user@host", or "user,project@host"
+          SF_ENDPOINT="${SOURCEFORGE_SFTP}"
+          if [[ "${SF_ENDPOINT}" == *@* ]]; then
+            SF_USER="${SF_ENDPOINT%@*}"
+            SF_HOST="${SF_ENDPOINT##*@}"
+          else
+            SF_USER="${SF_ENDPOINT}"
+            SF_HOST="frs.sourceforge.net"
+          fi
+          # Strip accidental sftp:// prefix from host if present
+          SF_HOST="${SF_HOST#sftp://}"
+          SF_HOST="${SF_HOST%%/*}"
+
+          echo "Uploading ${ISO_NAME} ($(du -h "${ISO}" | awk '{print $1}'))"
+          echo "  SFTP user: ${SF_USER}"
+          echo "  SFTP host: ${SF_HOST}"
+          echo "  Remote dir: /home/frs/project/enigmaos"
 
           sudo apt-get update -qq
           sudo apt-get install -y -qq lftp
 
           # Non-interactive SFTP via lftp (password auth)
           # Path: /home/frs/project/enigmaos  (SourceForge file release system)
-          lftp -u "${SOURCEFORGE_SFTP},${SOURCEFORGE_PASS}" sftp://frs.sourceforge.net <<EOF
+          lftp -u "${SF_USER},${SOURCEFORGE_PASS}" "sftp://${SF_HOST}" <<EOF
           set sftp:auto-confirm yes
           set net:timeout 60
           set net:max-retries 5
