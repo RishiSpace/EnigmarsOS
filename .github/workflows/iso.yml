@@ -51,8 +51,24 @@ jobs:
 
       - name: Checksums
         run: |
+          set -euo pipefail
+          # Docker mkarchiso leaves root-owned files; reclaim for the runner
+          sudo chown -R "$(id -u):$(id -g)" out work 2>/dev/null || true
+          chmod u+w out 2>/dev/null || true
+
           cd out
-          sha256sum *.iso | tee SHA256SUMS
+          shopt -s nullglob
+          isos=(*.iso)
+          if ((${#isos[@]} == 0)); then
+            echo "error: no ISO found in out/" >&2
+            ls -la
+            exit 1
+          fi
+
+          # Always rewrite checksums as the runner user (avoids root-owned SHA256SUMS)
+          rm -f SHA256SUMS
+          sha256sum "${isos[@]}" > SHA256SUMS
+          cat SHA256SUMS
           ls -lh
 
       - name: Upload build artifacts
@@ -110,3 +126,54 @@ jobs:
             Site: https://enigmarsos.rishispace.dev
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload ISO to SourceForge
+        env:
+          SOURCEFORGE_SFTP: ${{ secrets.SOURCEFORGE_SFTP }}
+          SOURCEFORGE_PASS: ${{ secrets.SOURCEFORGE_PASS }}
+        run: |
+          set -euo pipefail
+
+          if [[ -z "${SOURCEFORGE_SFTP:-}" || -z "${SOURCEFORGE_PASS:-}" ]]; then
+            echo "error: SOURCEFORGE_SFTP and SOURCEFORGE_PASS secrets must be set" >&2
+            exit 1
+          fi
+
+          sudo chown -R "$(id -u):$(id -g)" out 2>/dev/null || true
+
+          # Prefer the newest enigmarsos ISO; fall back to any ISO in out/
+          ISO=""
+          if compgen -G 'out/enigmarsos-*.iso' > /dev/null; then
+            ISO="$(ls -1t out/enigmarsos-*.iso | head -1)"
+          else
+            ISO="$(ls -1t out/*.iso | head -1)"
+          fi
+          if [[ -z "${ISO}" || ! -f "${ISO}" ]]; then
+            echo "error: no ISO file found to upload" >&2
+            ls -la out/ || true
+            exit 1
+          fi
+
+          ISO_NAME="$(basename "${ISO}")"
+          echo "Uploading ${ISO_NAME} ($(du -h "${ISO}" | awk '{print $1}')) to SourceForge project enigmaos"
+
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq lftp
+
+          # Non-interactive SFTP via lftp (password auth)
+          # Path: /home/frs/project/enigmaos  (SourceForge file release system)
+          lftp -u "${SOURCEFORGE_SFTP},${SOURCEFORGE_PASS}" sftp://frs.sourceforge.net <<EOF
+          set sftp:auto-confirm yes
+          set net:timeout 60
+          set net:max-retries 5
+          set net:reconnect-interval-base 10
+          set cmd:fail-exit true
+          cd /home/frs/project/enigmaos
+          put ${ISO} -o ${ISO_NAME}
+          ls -l ${ISO_NAME}
+          bye
+          EOF
+
+          echo "SourceForge upload complete: ${ISO_NAME}"
+          echo "Default download (after marking default on SF):"
+          echo "  https://sourceforge.net/projects/enigmaos/files/latest/download"

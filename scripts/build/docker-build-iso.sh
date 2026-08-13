@@ -49,5 +49,21 @@ echo "==> Running mkarchiso in container"
 echo "    This downloads a full desktop package set; first build can take a long time."
 docker run "${DOCKER_ARGS[@]}" "${IMAGE_NAME}"
 
+# mkarchiso runs as root inside the container; reclaim host ownership so
+# follow-up steps (checksums, uploads) can write into out/.
+HOST_UID="$(id -u)"
+HOST_GID="$(id -g)"
+echo "==> Fixing ownership of out/ and work/ (${HOST_UID}:${HOST_GID})"
+docker run --rm --privileged \
+  -v "${ROOT}:/build" \
+  -w /build \
+  --entrypoint bash \
+  "${IMAGE_NAME}" \
+  -c "chown -R ${HOST_UID}:${HOST_GID} /build/out /build/work 2>/dev/null || true"
+# Fallback when host can sudo (GitHub Actions runners)
+if command -v sudo >/dev/null 2>&1; then
+  sudo chown -R "${HOST_UID}:${HOST_GID}" "${OUT_DIR}" "${WORK_DIR}" 2>/dev/null || true
+fi
+
 echo "==> Host artifacts:"
 ls -lh "${OUT_DIR}" || true
