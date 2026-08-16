@@ -28,11 +28,20 @@ with urllib.request.urlopen(req, context=ctx, timeout=60) as resp:
 
 print(f"    release: {rel.get('tag_name')}")
 assets = rel.get("assets") or []
-wanted = [
-    a for a in assets
-    if a.get("name", "").endswith(".pkg.tar.zst") and a["name"].startswith("linux-enigmarsos")
-]
-if not wanted:
+wanted = []
+for a in assets:
+    name = a.get("name") or ""
+    if name.startswith("linux-enigmarsos") and (
+        name.endswith(".pkg.tar.zst")
+        or name in (
+            "linux-enigmarsos.db",
+            "linux-enigmarsos.db.tar.gz",
+            "linux-enigmarsos.files",
+            "linux-enigmarsos.files.tar.gz",
+        )
+    ):
+        wanted.append(a)
+if not any(a["name"].endswith(".pkg.tar.zst") for a in wanted):
     sys.exit("no linux-enigmarsos *.pkg.tar.zst assets on Latest release")
 
 for a in wanted:
@@ -56,32 +65,34 @@ for a in wanted:
     print(f"    wrote {out}")
 PY
 
-# Always rebuild the db locally (GitHub Latest may not ship .db yet, and
-# repo-add symlinks cannot be used as GitHub assets anyway).
-if ! command -v repo-add >/dev/null 2>&1; then
-  echo "error: repo-add not found (install pacman)" >&2
-  exit 1
-fi
-
 shopt -s nullglob
 pkgs=("${DEST}"/linux-enigmarsos-*.pkg.tar.zst)
 ((${#pkgs[@]})) || { echo "error: no packages in ${DEST}" >&2; exit 1; }
 
-(
-  cd "${DEST}"
-  rm -f linux-enigmarsos.db linux-enigmarsos.db.tar.gz \
-        linux-enigmarsos.files linux-enigmarsos.files.tar.gz \
-        linux-enigmarsos.db.tar.gz.old linux-enigmarsos.files.tar.gz.old
-  repo-add --new --remove linux-enigmarsos.db.tar.gz linux-enigmarsos-*.pkg.tar.zst
-  # Regular-file copies (harmless locally; matches the GitHub-mirror layout)
-  for stem in linux-enigmarsos.db linux-enigmarsos.files; do
-    if [[ -L "${stem}" ]]; then
-      target="$(readlink -f "${stem}")"
-      rm -f "${stem}"
-      cp -a "${target}" "${stem}"
-    fi
-  done
-)
+# Prefer the db shipped on Latest (Ubuntu CI has no pacman/repo-add).
+# Fall back to repo-add on Arch hosts. Docker ISO build rebuilds the db
+# if neither is available yet.
+if [[ -f "${DEST}/linux-enigmarsos.db" || -f "${DEST}/linux-enigmarsos.db.tar.gz" ]]; then
+  echo "==> Using linux-enigmarsos.db from GitHub Latest (no repo-add needed)"
+elif command -v repo-add >/dev/null 2>&1; then
+  echo "==> Building linux-enigmarsos.db with repo-add"
+  (
+    cd "${DEST}"
+    rm -f linux-enigmarsos.db linux-enigmarsos.db.tar.gz \
+          linux-enigmarsos.files linux-enigmarsos.files.tar.gz \
+          linux-enigmarsos.db.tar.gz.old linux-enigmarsos.files.tar.gz.old
+    repo-add --new --remove linux-enigmarsos.db.tar.gz linux-enigmarsos-*.pkg.tar.zst
+    for stem in linux-enigmarsos.db linux-enigmarsos.files; do
+      if [[ -L "${stem}" ]]; then
+        target="$(readlink -f "${stem}")"
+        rm -f "${stem}"
+        cp -a "${target}" "${stem}"
+      fi
+    done
+  )
+else
+  echo "==> repo-add not on this host; Docker ISO step will generate the db"
+fi
 
 echo "==> Kernel repo ready:"
 ls -lh "${DEST}"

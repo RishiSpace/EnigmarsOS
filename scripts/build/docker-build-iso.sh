@@ -33,6 +33,26 @@ mkdir -p "${OUT_DIR}"
 docker run --rm --privileged -v "${ROOT}:/build" -w /build --entrypoint bash "${IMAGE_NAME}" \
   -c 'rm -rf /build/work && mkdir -p /build/work /build/out'
 
+# Ubuntu runners have no pacman. If fetch-kernel-repo only got packages,
+# build the db inside the Arch ISO image before mkarchiso.
+if [[ ! -f "${ROOT}/repo/x86_64/linux-enigmarsos.db" && ! -f "${ROOT}/repo/x86_64/linux-enigmarsos.db.tar.gz" ]]; then
+  echo "==> Building linux-enigmarsos.db inside Arch container"
+  docker run --rm --privileged -v "${ROOT}:/build" -w /build/repo/x86_64 --entrypoint bash "${IMAGE_NAME}" \
+    -c 'set -euo pipefail
+        shopt -s nullglob
+        pkgs=(linux-enigmarsos-*.pkg.tar.zst)
+        ((${#pkgs[@]})) || { echo "no kernel packages in /build/repo/x86_64" >&2; exit 1; }
+        repo-add --new --remove linux-enigmarsos.db.tar.gz "${pkgs[@]}"
+        for stem in linux-enigmarsos.db linux-enigmarsos.files; do
+          if [[ -L "${stem}" ]]; then
+            cp -a "$(readlink -f "${stem}")" "${stem}.real"
+            rm -f "${stem}"
+            mv "${stem}.real" "${stem}"
+          fi
+        done
+        ls -lh'
+fi
+
 DOCKER_ARGS=(
   --rm
   --privileged
