@@ -42,29 +42,32 @@ for src_dir in \
   /run/archiso/bootmnt/boot
 do
   [[ -d "${src_dir}" ]] || continue
-  if copy_one "${src_dir}/vmlinuz-linux" "${ROOT}/boot/vmlinuz-linux"; then
-    copied_kernel=1
-  fi
-  copy_one "${src_dir}/initramfs-linux.img" "${ROOT}/boot/initramfs-linux.img" || true
-  copy_one "${src_dir}/initramfs-linux-fallback.img" "${ROOT}/boot/initramfs-linux-fallback.img" || true
-  copy_one "${src_dir}/amd-ucode.img" "${ROOT}/boot/amd-ucode.img" || true
-  copy_one "${src_dir}/intel-ucode.img" "${ROOT}/boot/intel-ucode.img" || true
+  shopt -s nullglob
+  for src in "${src_dir}"/vmlinuz-* "${src_dir}"/initramfs-*.img "${src_dir}"/amd-ucode.img "${src_dir}"/intel-ucode.img; do
+    [[ -f "${src}" ]] || continue
+    if copy_one "${src}" "${ROOT}/boot/$(basename "${src}")"; then
+      [[ "$(basename "${src}")" == vmlinuz-* ]] && copied_kernel=1
+    fi
+  done
+  shopt -u nullglob
 done
 
 if [[ ${copied_kernel} -eq 0 ]]; then
-  found="$(find /run/archiso /boot -type f -name 'vmlinuz-linux' 2>/dev/null | head -1 || true)"
+  found="$(find /run/archiso /boot -type f \( -name 'vmlinuz-linux-enigmarsos' -o -name 'vmlinuz-linux' \) 2>/dev/null | head -1 || true)"
   if [[ -n "${found}" ]]; then
-    copy_one "${found}" "${ROOT}/boot/vmlinuz-linux" && copied_kernel=1
+    copy_one "${found}" "${ROOT}/boot/$(basename "${found}")" && copied_kernel=1
     bdir="$(dirname "${found}")"
-    copy_one "${bdir}/initramfs-linux.img" "${ROOT}/boot/initramfs-linux.img" || true
-    copy_one "${bdir}/initramfs-linux-fallback.img" "${ROOT}/boot/initramfs-linux-fallback.img" || true
-    copy_one "${bdir}/amd-ucode.img" "${ROOT}/boot/amd-ucode.img" || true
-    copy_one "${bdir}/intel-ucode.img" "${ROOT}/boot/intel-ucode.img" || true
+    shopt -s nullglob
+    for src in "${bdir}"/initramfs-*.img "${bdir}"/amd-ucode.img "${bdir}"/intel-ucode.img; do
+      [[ -f "${src}" ]] || continue
+      copy_one "${src}" "${ROOT}/boot/$(basename "${src}")" || true
+    done
+    shopt -u nullglob
   fi
 fi
 
-if [[ ! -r "${ROOT}/boot/vmlinuz-linux" ]]; then
-  echo "ERROR: could not seed vmlinuz-linux into target /boot" >&2
+if [[ ! -r "${ROOT}/boot/vmlinuz-linux-enigmarsos" && ! -r "${ROOT}/boot/vmlinuz-linux" ]]; then
+  echo "ERROR: could not seed a kernel into target /boot" >&2
   echo "Live /boot:" >&2
   ls -la /boot 2>&1 || true
   echo "ISO mounts:" >&2
@@ -73,5 +76,6 @@ if [[ ! -r "${ROOT}/boot/vmlinuz-linux" ]]; then
   exit 1
 fi
 
-echo "==> Target kernel: $(ls -l "${ROOT}/boot/vmlinuz-linux")"
+echo "==> Target kernels:"
+ls -l "${ROOT}/boot"/vmlinuz-* 2>/dev/null || true
 echo "==> EnigmarsOS: seed-kernel done"

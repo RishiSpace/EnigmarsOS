@@ -78,6 +78,9 @@ cp -f "${ROOT}/packages.x86_64" "${ROOT}/archiso/packages.x86_64"
 cp -f "${ROOT}/profiledef.sh" "${ROOT}/archiso/profiledef.sh"
 chmod +x "${ROOT}/archiso/profiledef.sh"
 
+# Snapshot linux-enigmarsos from GitHub Latest into file:///build/repo/x86_64
+bash "${ROOT}/scripts/build/fetch-kernel-repo.sh"
+
 # Identity applied via pacman hook enigmarsos-os-release (avoids filesystem package conflict)
 
 echo "==> Profile prepared"

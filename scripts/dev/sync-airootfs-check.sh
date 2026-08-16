@@ -11,7 +11,12 @@ test -f "${ROOT}/archiso/airootfs/etc/pacman.d/hooks/enigmarsos-os-release.hook"
 test -f "${ROOT}/archiso/airootfs/usr/share/libalpm/scripts/enigmarsos-os-release"
 test -f "${ROOT}/packages/enigmarsos-welcome/enigmarsos-welcome"
 test -f "${ROOT}/scripts/build/docker-build-iso.sh"
+test -f "${ROOT}/scripts/build/fetch-kernel-repo.sh"
 test -f "${ROOT}/docker/Dockerfile"
+test -f "${ROOT}/archiso/airootfs/etc/pacman.d/linux-enigmarsos.conf"
+grep -q '^linux-enigmarsos$' "${ROOT}/packages.x86_64"
+grep -q 'linux-enigmarsos' "${ROOT}/archiso/pacman.conf"
+grep -q 'releases/latest/download' "${ROOT}/archiso/airootfs/etc/pacman.d/linux-enigmarsos.conf"
 # Identity branding must target rishispace
 grep -q 'enigmarsos.rishispace.dev' "${ROOT}/archiso/airootfs/usr/share/libalpm/scripts/enigmarsos-os-release"
 grep -q 'rishi@rishispace.dev' "${ROOT}/packages/enigmarsos-filesystem/PKGBUILD" || true

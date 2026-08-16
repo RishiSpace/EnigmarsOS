@@ -51,6 +51,7 @@ lftp
 libfido2
 libusb-compat
 linux
+linux-enigmarsos
 linux-atm
 linux-firmware
 linux-firmware-marvell
@@ -129,6 +130,7 @@ xl2tpd
 zsh
 base-devel
 linux-headers
+linux-enigmarsos-headers
 ntfs-3g
 alsa-firmware
 mesa

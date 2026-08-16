@@ -8,19 +8,27 @@ echo "==> EnigmarsOS: fix-mkinitcpio"
 rm -f /etc/mkinitcpio.conf.d/archiso.conf
 rm -f /etc/mkinitcpio.d/*.preset.pacnew 2>/dev/null || true
 
-cat >/etc/mkinitcpio.d/linux.preset <<'EOF'
-# mkinitcpio preset file for the 'linux' package on EnigmarsOS (installed system)
+write_preset() {
+  local pkg="$1"
+  local kver="/boot/vmlinuz-${pkg}"
+  [[ -r "${kver}" ]] || return 0
+  cat >"/etc/mkinitcpio.d/${pkg}.preset" <<EOF
+# mkinitcpio preset file for the '${pkg}' package on EnigmarsOS (installed system)
 
 ALL_config="/etc/mkinitcpio.conf"
-ALL_kver="/boot/vmlinuz-linux"
+ALL_kver="${kver}"
 
 PRESETS=('default' 'fallback')
 
-default_image="/boot/initramfs-linux.img"
+default_image="/boot/initramfs-${pkg}.img"
 
-fallback_image="/boot/initramfs-linux-fallback.img"
+fallback_image="/boot/initramfs-${pkg}-fallback.img"
 fallback_options="-S autodetect"
 EOF
+}
+
+write_preset linux-enigmarsos
+write_preset linux
 
 if [[ ! -f /etc/mkinitcpio.conf ]]; then
   cat >/etc/mkinitcpio.conf <<'EOF'
@@ -46,11 +54,12 @@ if [[ -f /etc/mkinitcpio.conf ]]; then
   sed -i 's/  */ /g' /etc/mkinitcpio.conf
 fi
 
-if [[ ! -r /boot/vmlinuz-linux ]]; then
-  echo "ERROR: /boot/vmlinuz-linux missing in target (seed-kernel should have copied it)" >&2
+if [[ ! -r /boot/vmlinuz-linux-enigmarsos && ! -r /boot/vmlinuz-linux ]]; then
+  echo "ERROR: no kernel in target /boot (seed-kernel should have copied it)" >&2
   ls -la /boot || true
   exit 1
 fi
 
-echo "==> Kernel present: $(ls -l /boot/vmlinuz-linux)"
+echo "==> Kernels present:"
+ls -l /boot/vmlinuz-* 2>/dev/null || true
 echo "==> EnigmarsOS: fix-mkinitcpio done"

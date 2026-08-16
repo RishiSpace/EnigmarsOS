@@ -1,6 +1,7 @@
 # Build artifacts
 work/
 out/
+repo/
 *.iso
 *.img
 *.sfs

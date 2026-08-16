@@ -64,9 +64,11 @@ Installed systems use **[Limine](https://github.com/Limine-Bootloader/Limine)**:
 - UEFI: `EFI/EnigmarsOS/BOOTX64.EFI` (+ fallback `EFI/BOOT/BOOTX64.EFI`)
 - BIOS: `limine bios-install` on the target disk + `limine-bios.sys`
 - Config: `limine.conf` on the ESP (also under `EFI/EnigmarsOS/`)
+- Default kernel is **`linux-enigmarsos`** (Arch + BORE) from the GitHub
+  Releases pacman mirror. Stock **`linux`** stays installed as fallback.
 - Kernels are **staged onto the ESP** (`EFI/EnigmarsOS/vmlinuz-*`) because Limine
   cannot read btrfs. A pacman hook runs `sync-esp-boot.sh` after every
-  `linux` / initramfs update so the ESP never keeps a stale kernel.
+  `linux` / `linux-enigmarsos` / initramfs update so the ESP never keeps a stale kernel.
 
 The live USB still boots with Syslinux (BIOS) / systemd-boot (UEFI) because
 `mkarchiso` does not provide Limine bootmodes; only the **installed** OS uses Limine.

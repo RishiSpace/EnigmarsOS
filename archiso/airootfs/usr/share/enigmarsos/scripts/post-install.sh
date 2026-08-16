@@ -13,17 +13,12 @@ elif [[ -f /usr/lib/os-release ]]; then
   cp -f /usr/lib/os-release /etc/os-release || true
 fi
 
-# Ensure installed-system mkinitcpio preset (idempotent)
-if [[ -r /boot/vmlinuz-linux ]]; then
-  cat >/etc/mkinitcpio.d/linux.preset <<'EOF'
-ALL_config="/etc/mkinitcpio.conf"
-ALL_kver="/boot/vmlinuz-linux"
-PRESETS=('default' 'fallback')
-default_image="/boot/initramfs-linux.img"
-fallback_image="/boot/initramfs-linux-fallback.img"
-fallback_options="-S autodetect"
-EOF
-  rm -f /etc/mkinitcpio.conf.d/archiso.conf
+# Ensure installed-system mkinitcpio presets (idempotent)
+rm -f /etc/mkinitcpio.conf.d/archiso.conf
+if [[ -x /usr/share/enigmarsos/scripts/fix-mkinitcpio.sh ]]; then
+  /usr/share/enigmarsos/scripts/fix-mkinitcpio.sh || true
+fi
+if compgen -G '/boot/vmlinuz-*' > /dev/null; then
   mkinitcpio -P || true
 fi
 

@@ -128,13 +128,16 @@ done
 stage_one /boot/amd-ucode.img amd-ucode.img || true
 stage_one /boot/intel-ucode.img intel-ucode.img || true
 
-# Prefer primary "linux" entry first in the menu
+# Default Limine entry: EnigmarsOS kernel, then stock Arch linux, then others
 sorted_pkgs=()
+for p in "${STAGED_PKGS[@]}"; do
+  [[ "${p}" == "linux-enigmarsos" ]] && sorted_pkgs+=("${p}")
+done
 for p in "${STAGED_PKGS[@]}"; do
   [[ "${p}" == "linux" ]] && sorted_pkgs+=("${p}")
 done
 for p in "${STAGED_PKGS[@]}"; do
-  [[ "${p}" == "linux" ]] || sorted_pkgs+=("${p}")
+  [[ "${p}" != "linux-enigmarsos" && "${p}" != "linux" ]] && sorted_pkgs+=("${p}")
 done
 
 # Root cmdline (same logic as install-limine)
