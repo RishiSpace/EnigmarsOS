@@ -1,60 +1,38 @@
 # EnigmarsOS
 
-**Privacy first · Secure by default · Ready immediately**
+Arch-based Linux with KDE Plasma 6. Privacy defaults, Calamares installer, Limine on the installed system.
 
-EnigmarsOS is a production-minded Linux distribution based on Arch Linux with KDE Plasma 6. It is **not** a casual remaster: the repository is structured for long-term packaging, branded install media, reproducible ISO builds and a coherent desktop experience.
+Default kernel is [`linux-enigmarsos`](https://github.com/RishiSpace/linux-enigmarsos) (Arch + BORE). Stock `linux` stays around as a fallback.
 
-> Stay as close to upstream Arch as reasonably possible. Customize only where it improves UX, security, privacy, performance or branding.
-
-## Design principles
-
-1. **Privacy first** — no telemetry, no ads, no forced accounts  
-2. **Secure by default** — AppArmor, UFW, LUKS-ready, hardened sysctl  
-3. **Ready immediately** — gaming, development, office, multimedia out of the box  
-4. **Developer friendly** — full toolchains without bootstrap rituals  
-5. **Gaming ready** — Steam/Lutris/Heroic/Proton stack preinstalled  
-6. **Beautiful minimalism** — AMOLED black, cyan & purple accents, consistent branding  
-
-## Repository layout
+## Layout
 
 ```
-EnigmarsOS/
-├── archiso/           # mkarchiso profile (airootfs, boot loaders)
-├── packages/          # Custom PKGBUILDs (welcome, artwork, settings, …)
-├── branding/          # Logos and brand assets
-├── wallpapers/        # Desktop wallpapers
-├── themes/            # Plasma, Konsole, etc.
-├── plymouth/          # Boot splash
-├── sddm/              # Display manager theme
-├── calamares/         # Installer settings + branding
-├── scripts/           # Build, release and developer tooling
-├── docs/              # End-user documentation
-├── docker/            # Arch container image for ISO builds
-├── public/EnigmarsOS.png
-├── packages.x86_64    # ISO package list
-├── profiledef.sh      # ISO identity
-└── README.md
+archiso/           mkarchiso profile
+packages/          custom PKGBUILDs
+branding/          logos
+themes/            Plasma / icons
+plymouth/          boot splash
+calamares/         installer
+scripts/           build and install helpers
+docs/              user docs
+docker/            ISO build image
+public/EnigmarsOS.png
+packages.x86_64    ISO package list
+profiledef.sh      ISO identity
 ```
 
-## Build the ISO (Docker — recommended)
+## Build the ISO
 
-Requires Docker with privilege support (loop mounts, pacstrap):
+Docker (easiest):
 
 ```bash
-# Prepare branding into the archiso profile
 ./scripts/build/prepare-profile.sh
-
-# Build inside an Arch Linux container
 ./scripts/build/docker-build-iso.sh
 ```
 
-Artifacts land in `out/`. Equivalent Make target:
+or `make iso-docker`. Output is in `out/`.
 
-```bash
-make iso-docker
-```
-
-### Native Arch host
+On Arch:
 
 ```bash
 sudo pacman -S --needed archiso git squashfs-tools dosfstools libisoburn mtools
@@ -62,52 +40,45 @@ sudo pacman -S --needed archiso git squashfs-tools dosfstools libisoburn mtools
 sudo ./scripts/build/build-iso.sh
 ```
 
-### Sign release artifacts
+Sign an ISO:
 
 ```bash
 export ENIGMARSOS_GPG_KEY=YOUR_KEY_ID
 ./scripts/release/sign-iso.sh out/enigmarsos-*.iso
 ```
 
-## Custom packages
+## Packages
 
-| Package | Role |
-|---------|------|
-| `enigmarsos-filesystem` | `os-release`, issue, motd |
-| `enigmarsos-settings` | Secure defaults, Plasma skel |
-| `enigmarsos-artwork` | Logos, wallpapers, colors |
-| `enigmarsos-welcome` | Welcome application |
-| `enigmarsos-calamares-config` | Installer branding |
-| `enigmarsos-firefox-config` | Privacy policies + uBlock |
-| `enigmarsos-hooks` | pacman hooks |
-| `enigmarsos-keyring` | Package signing keyring |
+| Package | What it is |
+|---------|------------|
+| `enigmarsos-filesystem` | os-release, issue, motd |
+| `enigmarsos-settings` | Plasma / security defaults |
+| `enigmarsos-artwork` | logos, wallpapers, colors |
+| `enigmarsos-welcome` | welcome app |
+| `enigmarsos-calamares-config` | installer branding |
+| `enigmarsos-firefox-config` | Firefox policies + uBlock |
+| `enigmarsos-hooks` | pacman hooks (ESP kernel sync, …) |
+| `enigmarsos-keyring` | package signing |
 
-## Live session
+## Live USB
 
-| Item | Value |
-|------|--------|
+| | |
+|--|--|
 | User | `live` / `live` |
 | Desktop | Plasma 6 (Wayland) |
 | Installer | Calamares (`sudo calamares`) |
-| Branding | EnigmarsOS (no visible Arch labels) |
 
-## Documentation
+## Docs
 
-See [`docs/`](docs/README.md) for installation, gaming, development, virtualization, security, recovery, snapshots, updates and troubleshooting.
+[`docs/`](docs/README.md) covers install, gaming, recovery, and troubleshooting.
 
-## Contributing
-
-1. Keep changes modular and documented.  
-2. Prefer upstream packages over forks.  
-3. Never reintroduce telemetry or insecure defaults.  
-4. Preserve branding consistency (logo: `public/EnigmarsOS.png`).  
-5. Run `./scripts/dev/sync-airootfs-check.sh` before opening a PR.
+Before a PR: `./scripts/dev/sync-airootfs-check.sh`.
 
 ## License
 
-GPL-3.0-or-later for EnigmarsOS-specific packaging, branding integration and tooling. Upstream components retain their own licenses. Arch Linux is a trademark of Aaron Griffin and Judd Vinet; EnigmarsOS is an independent project and is not affiliated with Arch Linux.
+GPL-3.0-or-later for EnigmarsOS packaging and tooling. Upstream keeps its own licenses. Not affiliated with Arch Linux.
 
 ## Links
 
-- Docs: https://enigmarsos.rishispace.dev/docs  
-- Issues: https://github.com/RishiSpace/EnigmarsOS/issues  
+- Site / docs: https://enigmarsos.rishispace.dev
+- Issues: https://github.com/RishiSpace/EnigmarsOS/issues
