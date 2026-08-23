@@ -242,5 +242,11 @@ if command -v limine >/dev/null 2>&1; then
   fi
 fi
 
+# Re-sign ESP + /boot images if the user enrolled keys with sbctl.
+if command -v sbctl >/dev/null 2>&1; then
+  echo "    sbctl sign-all (Secure Boot)"
+  sbctl sign-all || echo "WARNING: sbctl sign-all failed — run it before rebooting with Secure Boot on" >&2
+fi
+
 echo "==> EnigmarsOS: sync-esp-boot done (ESP=${ESP}, pkgs=${sorted_pkgs[*]})"
 exit 0
