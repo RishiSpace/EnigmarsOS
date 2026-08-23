@@ -1,6 +1,13 @@
 # Optional AUR / external packages for a full EnigmarsOS experience.
 # Build into a custom [enigmarsos] repo or install post-setup.
 #
+# Dropped from [multilib] ~2026-08 (Wine 32-bit extras; do not add to packages.x86_64):
+# lib32-openal
+# lib32-giflib
+# lib32-mpg123
+# lib32-v4l-utils
+# lib32-libxslt
+#
 # heroic-games-launcher
 # protonup-qt
 # dxvk-bin
