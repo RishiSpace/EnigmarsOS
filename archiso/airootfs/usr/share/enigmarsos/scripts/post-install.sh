@@ -60,6 +60,9 @@ rm -f /etc/polkit-1/rules.d/49-enigmarsos-live.rules
 # AppArmor
 systemctl enable apparmor.service 2>/dev/null || true
 
+# Restage Limine kernels on boot/shutdown (covers Discover/PackageKit)
+systemctl enable enigmarsos-sync-esp.service 2>/dev/null || true
+
 # First-boot flag for welcome app
 mkdir -p /etc/skel/.config/enigmarsos
 echo "show=true" > /etc/skel/.config/enigmarsos/welcome.conf

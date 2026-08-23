@@ -1,0 +1,16 @@
+[Unit]
+Description=Stage Limine kernels onto the EFI System Partition
+Documentation=file:///usr/share/doc/enigmarsos/troubleshooting/README.md
+RequiresMountsFor=/boot/efi
+After=local-fs.target
+DefaultDependencies=yes
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/share/enigmarsos/scripts/sync-esp-boot.sh
+# Discover/PackageKit can skip alpm hooks; restage while ESP is still mounted.
+ExecStop=/usr/share/enigmarsos/scripts/sync-esp-boot.sh
+
+[Install]
+WantedBy=multi-user.target

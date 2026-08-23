@@ -1,29 +1,40 @@
 #!/bin/bash
-# alpm hook helper — never fail the pacman transaction hard if ESP is missing
-# during chroot edge cases; still surface errors clearly.
+# alpm hook helper — stage kernels onto the ESP after kernel updates.
+# On an installed system with /boot/efi in fstab, failure MUST fail the
+# transaction. Discover/PackageKit otherwise reports success and reboot
+# into a stale Limine kernel (emergency mode: Failed to mount /boot/efi).
 set -u
 
 SCRIPT=/usr/share/enigmarsos/scripts/sync-esp-boot.sh
 
 if [[ ! -x "${SCRIPT}" ]]; then
   echo "enigmarsos-sync-esp: missing ${SCRIPT}" >&2
+  # Live ISO / incomplete image
+  [[ -d /run/archiso ]] && exit 0
+  exit 1
+fi
+
+# Skip mkarchiso / packaging chroots with no real firmware + no fstab
+if [[ ! -d /sys/firmware ]] && [[ ! -e /etc/fstab ]]; then
   exit 0
 fi
 
-# Skip on live ISO / airootfs packaging environments without a real ESP
-if [[ ! -d /sys/firmware ]] && [[ ! -e /etc/fstab ]]; then
+# Live USB: do not fail pacstrap/ISO builds
+if [[ -d /run/archiso ]]; then
+  "${SCRIPT}" || true
   exit 0
 fi
 
 if ! "${SCRIPT}"; then
   echo "" >&2
-  echo "WARNING: EnigmarsOS could not stage the kernel onto the ESP." >&2
-  echo "         After reboot Limine may load a stale kernel and drop to" >&2
-  echo "         emergency mode (Failed to mount /boot/efi)." >&2
-  echo "         Fix: mount the ESP and run:" >&2
-  echo "           sudo ${SCRIPT}" >&2
+  echo "ERROR: EnigmarsOS could not stage the kernel onto the ESP." >&2
+  echo "       Reboot would load a stale Limine kernel and drop to" >&2
+  echo "       emergency mode (Failed to mount /boot/efi)." >&2
+  echo "       Mount the ESP and run: sudo ${SCRIPT}" >&2
   echo "" >&2
-  # Exit 0 so pacman itself still succeeds; user sees the warning.
+  if grep -qE '[[:space:]]/boot/efi[[:space:]]' /etc/fstab 2>/dev/null; then
+    exit 1
+  fi
   exit 0
 fi
 

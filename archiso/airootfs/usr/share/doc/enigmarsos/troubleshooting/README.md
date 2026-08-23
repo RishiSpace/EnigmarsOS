@@ -63,8 +63,18 @@ sudo /usr/share/enigmarsos/scripts/sync-esp-boot.sh
 # sudo bash /path/to/repair-limine-boot.sh
 ```
 
-After a good boot, every future `pacman -Syu` should print
-**Staging kernel/initramfs onto ESP for Limine...**
+After a good boot, install/enable the hook **and** `enigmarsos-sync-esp.service`
+so Discover/`pacman -Syu` restage before reboot. A kernel update that cannot
+write the ESP must **fail**, not succeed and brick the next boot.
+
+If Discover applied an upstream `linux` update and you still land in emergency
+mode, the alpm hook was skipped or the ESP was not mounted — check:
+
+```bash
+ls /usr/share/libalpm/hooks/90-enigmarsos-sync-esp.hook
+systemctl status enigmarsos-sync-esp.service
+journalctl -b -1 -u enigmarsos-sync-esp.service
+```
 
 ## Reinstall bootloader
 
