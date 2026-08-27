@@ -51,8 +51,12 @@ Flatpak Flathub is preconfigured. Firmware updates appear in Discover when `fwup
 
 If an older ISO fails at **mkinitcpio** with
 `/boot/vmlinuz-linux must be readable`, that image still used the live
-archiso initramfs preset. Current ISOs reinstall `linux` on the target and
-rewrite the preset before generating initramfs.
+archiso initramfs preset. Current ISOs rewrite the preset before generating
+initramfs.
+
+If Calamares fails at **mkinitcpio** with `module not found: 'crc32c_intel'`,
+that ISO still let the installer inject a module Linux 6.14+ removed. Current
+ISOs drop it in `fix-mkinitcpio` before building initramfs.
 
 The installed system needs network access during install so `pacman` can
 fetch the kernel package set.
