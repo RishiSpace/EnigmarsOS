@@ -73,6 +73,10 @@ if [[ -f "${ROOT}/packages/enigmarsos-welcome/enigmarsos-welcome" ]]; then
     "${AIO}/usr/share/applications/enigmarsos-welcome.desktop"
 fi
 
+# enigmars-utils owns these paths; leaving them here makes pacstrap fail
+rm -f "${AIO}/usr/share/icons/hicolor/scalable/apps/enigmarsos.svg"
+rm -f "${AIO}/usr/share/pixmaps/enigmarsos.png"
+
 # Keep package list + identity in sync
 cp -f "${ROOT}/packages.x86_64" "${ROOT}/archiso/packages.x86_64"
 cp -f "${ROOT}/profiledef.sh" "${ROOT}/archiso/profiledef.sh"
