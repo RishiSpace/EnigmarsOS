@@ -1,6 +1,10 @@
 # Stage kernels onto the ESP so Limine boots the same version pacman installed.
 # Without this, linux upgrades leave a stale kernel on the ESP and the next boot
 # loses modules (vfat) → Failed to mount /boot/efi → emergency mode.
+#
+# Filename MUST sort after 90-mkinitcpio-install.hook. Arch kernel packages
+# install vmlinuz under /usr/lib/modules; mkinitcpio copies it to /boot.
+# 90-enigmarsos-* ran first and saw an empty /boot during pacman -Syu.
 
 [Trigger]
 Operation = Install

@@ -71,7 +71,7 @@ If Discover applied an upstream `linux` update and you still land in emergency
 mode, the alpm hook was skipped or the ESP was not mounted — check:
 
 ```bash
-ls /usr/share/libalpm/hooks/90-enigmarsos-sync-esp.hook
+ls /usr/share/libalpm/hooks/99-enigmarsos-sync-esp.hook
 systemctl status enigmarsos-sync-esp.service
 journalctl -b -1 -u enigmarsos-sync-esp.service
 ```

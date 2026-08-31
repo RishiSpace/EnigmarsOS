@@ -2,11 +2,11 @@
 # Stage kernel/initramfs/ucode onto the ESP for Limine after package updates.
 #
 # Limine can only *read* FAT. On a typical EnigmarsOS install, /boot lives on
-# btrfs (root) while the ESP is mounted at /boot/efi. pacman writes new kernels
-# to /boot only; without this sync, Limine keeps booting the *old* kernel from
-# the ESP after linux upgrades. That kernel has no matching modules → vfat fails
-# → "Failed to mount /boot/efi" → emergency mode. UFW ("CLI Netfilter Manager")
-# also fails for the same missing-modules reason.
+# btrfs (root) while the ESP is mounted at /boot/efi. Kernel packages install
+# vmlinuz under /usr/lib/modules; mkinitcpio then copies it to /boot. Without
+# this sync, Limine keeps booting the *old* kernel from the ESP after upgrades.
+# That kernel has no matching modules → vfat fails → "Failed to mount /boot/efi"
+# → emergency mode. UFW ("CLI Netfilter Manager") also fails for the same reason.
 #
 # Safe to run: at install (after install-limine), from pacman hooks, or manually:
 #   sudo /usr/share/enigmarsos/scripts/sync-esp-boot.sh
@@ -101,8 +101,15 @@ stage_one() {
 }
 
 # Discover kernels: /boot/vmlinuz-<pkg>
+# Arch kernel packages put vmlinuz in /usr/lib/modules; mkinitcpio copies to
+# /boot. If we ran before 90-mkinitcpio-install, generate /boot here.
 shopt -s nullglob
 kernels=(/boot/vmlinuz-*)
+if ((${#kernels[@]} == 0)) && command -v mkinitcpio >/dev/null 2>&1 && [[ ! -d /run/archiso ]]; then
+  echo "    /boot has no vmlinuz-*; running mkinitcpio -P"
+  mkinitcpio -P || true
+  kernels=(/boot/vmlinuz-*)
+fi
 if ((${#kernels[@]} == 0)); then
   echo "ERROR: no /boot/vmlinuz-* found — install a kernel package first" >&2
   exit 1
