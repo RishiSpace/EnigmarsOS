@@ -173,8 +173,10 @@ if [[ -n "${ROOT_UUID}" ]]; then
       for (i = 1; i <= NF; i++)
         if ($i ~ /^UUID=/) { sub(/^UUID=/, "", $i); print $i; exit }
     }' /etc/crypttab || true)"
+    CRYPT_NAME="$(awk '!/^#/ && NF { print $1; exit }' /etc/crypttab || true)"
     if [[ -n "${CRYPT_UUID}" ]]; then
-      CMDLINE="rd.luks.uuid=${CRYPT_UUID} ${CMDLINE}"
+      CRYPT_NAME="${CRYPT_NAME:-root}"
+      CMDLINE="cryptdevice=UUID=${CRYPT_UUID}:${CRYPT_NAME} rd.luks.uuid=${CRYPT_UUID} ${CMDLINE}"
     fi
   fi
 fi

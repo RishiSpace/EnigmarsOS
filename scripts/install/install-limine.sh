@@ -58,12 +58,15 @@ if [[ "${ROOT_FSTYPE}" == "btrfs" ]]; then
 fi
 
 if [[ "${ROOT_SRC}" == /dev/mapper/* ]] && [[ -r /etc/crypttab ]]; then
+  CRYPT_NAME="$(awk '!/^#/ && NF { print $1; exit }' /etc/crypttab || true)"
   CRYPT_UUID="$(awk '!/^#/ && NF {
     for (i = 1; i <= NF; i++)
       if ($i ~ /^UUID=/) { sub(/^UUID=/, "", $i); print $i; exit }
   }' /etc/crypttab || true)"
   if [[ -n "${CRYPT_UUID}" ]]; then
-    CMDLINE="rd.luks.uuid=${CRYPT_UUID} ${CMDLINE}"
+    CRYPT_NAME="${CRYPT_NAME:-root}"
+    # encrypt hook wants cryptdevice=; sd-encrypt wants rd.luks.uuid=
+    CMDLINE="cryptdevice=UUID=${CRYPT_UUID}:${CRYPT_NAME} rd.luks.uuid=${CRYPT_UUID} ${CMDLINE}"
   fi
 fi
 
@@ -317,6 +320,13 @@ fi
 if ! is_fat "${BOOT_FSTYPE}" || [[ "${ESP}" != "/boot" && "$(findmnt -no UUID "${ESP}" 2>/dev/null)" != "${BOOT_UUID}" ]]; then
   [[ -f "${STAGE_DIR}/vmlinuz-linux" ]] || die "staged vmlinuz-linux missing on ESP"
   [[ -f "${STAGE_DIR}/initramfs-linux.img" ]] || die "staged initramfs-linux.img missing on ESP"
+fi
+
+# Stage every kernel (prefers linux-enigmarsos) and rewrite limine.conf.
+# Must run here: Calamares post-install can fail later and skip its copy.
+if [[ -x /usr/share/enigmarsos/scripts/sync-esp-boot.sh ]]; then
+  /usr/share/enigmarsos/scripts/sync-esp-boot.sh || \
+    echo "WARNING: sync-esp-boot after install-limine failed" >&2
 fi
 
 echo "==> EnigmarsOS: install-limine done (UEFI=${IS_UEFI})"

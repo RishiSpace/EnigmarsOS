@@ -21,6 +21,12 @@ fi
 if compgen -G '/boot/vmlinuz-*' > /dev/null; then
   mkinitcpio -P || true
 fi
+# Restage ESP *before* later optional steps. Limine still has the live
+# initramfs until this runs; skipping it drops boot into
+# "device did not show up after 30 seconds".
+if [[ -x /usr/share/enigmarsos/scripts/sync-esp-boot.sh ]]; then
+  /usr/share/enigmarsos/scripts/sync-esp-boot.sh || true
+fi
 
 # Plymouth theme
 if command -v plymouth-set-default-theme >/dev/null 2>&1; then
@@ -68,21 +74,26 @@ mkdir -p /etc/skel/.config/enigmarsos
 echo "show=true" > /etc/skel/.config/enigmarsos/welcome.conf
 
 # Pin Enigmars Utils on the Desktop and autostart it for real users (not live)
+copy_if_different() {
+  local src="$1" dest="$2" mode="$3"
+  [[ -f "${src}" ]] || return 0
+  mkdir -p "$(dirname "${dest}")"
+  if [[ "$(readlink -f "${src}" 2>/dev/null || true)" == "$(readlink -f "${dest}" 2>/dev/null || true)" ]]; then
+    chmod "${mode}" "${dest}" 2>/dev/null || true
+    return 0
+  fi
+  install -m"${mode}" "${src}" "${dest}"
+}
 pin_enigmars_utils() {
-  local home="$1"
+  local home="$1" src
   [[ -d "${home}" ]] || return 0
   mkdir -p "${home}/Desktop" "${home}/.config/autostart"
-  if [[ -f /usr/share/applications/org.enigmars.Util.desktop ]]; then
-    install -m755 /usr/share/applications/org.enigmars.Util.desktop \
-      "${home}/Desktop/org.enigmars.Util.desktop"
-  elif [[ -f /etc/skel/Desktop/org.enigmars.Util.desktop ]]; then
-    install -m755 /etc/skel/Desktop/org.enigmars.Util.desktop \
-      "${home}/Desktop/org.enigmars.Util.desktop"
-  fi
-  if [[ -f /etc/skel/.config/autostart/org.enigmars.Util.desktop ]]; then
-    install -m644 /etc/skel/.config/autostart/org.enigmars.Util.desktop \
-      "${home}/.config/autostart/org.enigmars.Util.desktop"
-  fi
+  src="/usr/share/applications/org.enigmars.Util.desktop"
+  [[ -f "${src}" ]] || src="/etc/skel/Desktop/org.enigmars.Util.desktop"
+  copy_if_different "${src}" "${home}/Desktop/org.enigmars.Util.desktop" 755
+  copy_if_different \
+    /etc/skel/.config/autostart/org.enigmars.Util.desktop \
+    "${home}/.config/autostart/org.enigmars.Util.desktop" 644
   rm -f "${home}/Desktop/install-enigmarsos.desktop"
   local owner
   owner="$(stat -c '%U:%G' "${home}" 2>/dev/null || true)"
@@ -91,21 +102,16 @@ pin_enigmars_utils() {
   fi
 }
 rm -f /etc/skel/Desktop/install-enigmarsos.desktop
-pin_enigmars_utils /etc/skel
+pin_enigmars_utils /etc/skel || true
 for home in /home/*; do
   [[ -d "${home}" ]] || continue
   [[ "$(basename "${home}")" == live ]] && continue
-  pin_enigmars_utils "${home}"
+  pin_enigmars_utils "${home}" || true
 done
 
 # Reflector once
 if command -v reflector >/dev/null 2>&1; then
   reflector --protocol https --latest 15 --sort rate --save /etc/pacman.d/mirrorlist || true
-fi
-
-# Ensure ESP has the same kernel as /boot (idempotent with install-limine)
-if [[ -x /usr/share/enigmarsos/scripts/sync-esp-boot.sh ]]; then
-  /usr/share/enigmarsos/scripts/sync-esp-boot.sh || true
 fi
 
 echo "EnigmarsOS post-install complete."

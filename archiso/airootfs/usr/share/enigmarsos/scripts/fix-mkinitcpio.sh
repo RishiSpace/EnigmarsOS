@@ -102,6 +102,16 @@ if [[ -f /etc/mkinitcpio.conf ]]; then
     -e 's/\<memdisk\>//g' \
     /etc/mkinitcpio.conf
   sed -i 's/  */ /g' /etc/mkinitcpio.conf
+  # Live ISO HOOKS include encrypt/lvm2. Drop them unless the target
+  # actually uses LUKS/LVM, or initramfs waits 30s for a missing device.
+  if ! awk '!/^[[:space:]]*#/ && NF && $1 != "none" { found=1 } END { exit !found }' /etc/crypttab 2>/dev/null; then
+    sed -i -e 's/\<sd-encrypt\>//g' -e 's/\<encrypt\>//g' /etc/mkinitcpio.conf
+  fi
+  if ! ls /dev/mapper/vg* /dev/mapper/*-lv* >/dev/null 2>&1 \
+     && ! grep -qE '^[[:space:]]*[^#].*lvm' /etc/fstab 2>/dev/null; then
+    sed -i -e 's/\<lvm2\>//g' /etc/mkinitcpio.conf
+  fi
+  sed -i 's/  */ /g' /etc/mkinitcpio.conf
   drop_unresolvable_modules /etc/mkinitcpio.conf
 fi
 
