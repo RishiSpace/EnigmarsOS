@@ -25,18 +25,23 @@ sudo -u "${BUILD_USER}" git clone --depth 1 "${REPO}" "${SRC}"
 sudo -u "${BUILD_USER}" bash -lc "
   set -euo pipefail
   cd '${SRC}/packaging/arch'
-  makepkg -f --noconfirm --needed -p PKGBUILD.local
+  # -d: do not install pyside6 into the ISO builder; pacstrap pulls it on the ISO.
+  makepkg -fd --noconfirm -p PKGBUILD.local
 "
 
 mkdir -p "${DEST}"
 shopt -s nullglob
-pkgs=("${SRC}"/packaging/arch/enigmars-utils-*.pkg.tar.zst)
+pkgs=()
+for f in "${SRC}"/packaging/arch/enigmars-utils-*.pkg.tar.zst; do
+  [[ "${f}" == *-debug-* ]] && continue
+  pkgs+=("${f}")
+done
 ((${#pkgs[@]})) || { echo "error: makepkg produced no enigmars-utils package" >&2; exit 1; }
 cp -v "${pkgs[@]}" "${DEST}/"
 
 (
   cd "${DEST}"
-  repo-add enigmarsos-local.db.tar.gz enigmars-utils-*.pkg.tar.zst
+  repo-add enigmarsos-local.db.tar.gz enigmars-utils-[0-9]*.pkg.tar.zst
   for stem in enigmarsos-local.db enigmarsos-local.files; do
     if [[ -L "${stem}" ]]; then
       target="$(readlink -f "${stem}")"
