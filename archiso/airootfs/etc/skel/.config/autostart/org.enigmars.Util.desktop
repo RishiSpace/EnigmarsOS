@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Enigmars Utils
+Exec=/usr/local/bin/enigmars-util-autostart
+Icon=enigmarsos
+Terminal=false
+Categories=System;
+X-KDE-autostart-phase=1
+X-KDE-autostart-after=panel
+X-GNOME-Autostart-enabled=true
+OnlyShowIn=KDE;

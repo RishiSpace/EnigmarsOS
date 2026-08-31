@@ -1,0 +1,12 @@
+#!/bin/bash
+# Open Enigmars Utils on login for installed systems only.
+# The live ISO has /run/archiso and user `live` — do not start there.
+set -eu
+if [[ -d /run/archiso ]]; then
+  exit 0
+fi
+if [[ "$(id -un 2>/dev/null || true)" == "live" ]]; then
+  exit 0
+fi
+command -v enigmars-util >/dev/null 2>&1 || exit 0
+exec enigmars-util

@@ -1,6 +1,9 @@
 # Optional AUR / external packages for a full EnigmarsOS experience.
 # Build into a custom [enigmarsos] repo or install post-setup.
 #
+# enigmars-utils is not listed here: the ISO clones GitHub
+# (RishiSpace/enigmars-utils) and pacstraps it from [enigmarsos-local].
+#
 # Dropped from [multilib] ~2026-08 (Wine 32-bit extras; do not add to packages.x86_64):
 # lib32-openal
 # lib32-giflib

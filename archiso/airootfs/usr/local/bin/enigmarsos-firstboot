@@ -14,8 +14,10 @@ if command -v flatpak >/dev/null 2>&1; then
   flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo 2>/dev/null || true
 fi
 
-# Launch welcome if available
-if command -v enigmarsos-welcome >/dev/null 2>&1; then
+# Launch the landing hub on installed systems (not the live ISO)
+if [[ ! -d /run/archiso ]] && command -v enigmars-util >/dev/null 2>&1; then
+  enigmars-util || true
+elif command -v enigmarsos-welcome >/dev/null 2>&1; then
   enigmarsos-welcome || true
 fi
 

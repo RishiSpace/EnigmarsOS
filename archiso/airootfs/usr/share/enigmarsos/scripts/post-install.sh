@@ -67,6 +67,37 @@ systemctl enable enigmarsos-sync-esp.service 2>/dev/null || true
 mkdir -p /etc/skel/.config/enigmarsos
 echo "show=true" > /etc/skel/.config/enigmarsos/welcome.conf
 
+# Pin Enigmars Utils on the Desktop and autostart it for real users (not live)
+pin_enigmars_utils() {
+  local home="$1"
+  [[ -d "${home}" ]] || return 0
+  mkdir -p "${home}/Desktop" "${home}/.config/autostart"
+  if [[ -f /usr/share/applications/org.enigmars.Util.desktop ]]; then
+    install -m755 /usr/share/applications/org.enigmars.Util.desktop \
+      "${home}/Desktop/org.enigmars.Util.desktop"
+  elif [[ -f /etc/skel/Desktop/org.enigmars.Util.desktop ]]; then
+    install -m755 /etc/skel/Desktop/org.enigmars.Util.desktop \
+      "${home}/Desktop/org.enigmars.Util.desktop"
+  fi
+  if [[ -f /etc/skel/.config/autostart/org.enigmars.Util.desktop ]]; then
+    install -m644 /etc/skel/.config/autostart/org.enigmars.Util.desktop \
+      "${home}/.config/autostart/org.enigmars.Util.desktop"
+  fi
+  rm -f "${home}/Desktop/install-enigmarsos.desktop"
+  local owner
+  owner="$(stat -c '%U:%G' "${home}" 2>/dev/null || true)"
+  if [[ -n "${owner}" ]]; then
+    chown -R "${owner}" "${home}/Desktop" "${home}/.config/autostart" 2>/dev/null || true
+  fi
+}
+rm -f /etc/skel/Desktop/install-enigmarsos.desktop
+pin_enigmars_utils /etc/skel
+for home in /home/*; do
+  [[ -d "${home}" ]] || continue
+  [[ "$(basename "${home}")" == live ]] && continue
+  pin_enigmars_utils "${home}"
+done
+
 # Reflector once
 if command -v reflector >/dev/null 2>&1; then
   reflector --protocol https --latest 15 --sort rate --save /etc/pacman.d/mirrorlist || true

@@ -417,6 +417,8 @@ gvfs-nfs
 android-tools
 android-udev
 calamares
+enigmars-utils
+pyside6
 gparted
 dialog
 iotop

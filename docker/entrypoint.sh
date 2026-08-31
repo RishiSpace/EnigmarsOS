@@ -64,6 +64,11 @@ if [[ -x "${ROOT}/scripts/build/prepare-profile.sh" ]]; then
   bash "${ROOT}/scripts/build/prepare-profile.sh"
 fi
 
+# enigmars-utils from GitHub → enigmarsos-local (not on Arch extra)
+if [[ -x "${ROOT}/scripts/build/build-enigmars-utils-pkg.sh" ]]; then
+  bash "${ROOT}/scripts/build/build-enigmars-utils-pkg.sh"
+fi
+
 # Keep branding files from being overwritten by package extraction
 if ! grep -q '^NoExtract' "${PROFILE}/pacman.conf"; then
   sed -i '/^#NoExtract/a NoExtract = usr/lib/os-release etc/os-release etc/hostname etc/motd' "${PROFILE}/pacman.conf" ||     echo 'NoExtract = usr/lib/os-release etc/os-release etc/hostname etc/motd' >> "${PROFILE}/pacman.conf"
@@ -88,7 +93,7 @@ fi
 pacman -Sy --noconfirm
 
 # Quick validation of packages that historically broke the build
-for p in calamares steam mesa 7zip iptables; do
+for p in calamares enigmars-utils steam mesa 7zip iptables; do
   if ! pacman -Si "$p" >/dev/null 2>&1; then
     echo "error: package not resolvable: $p" >&2
     exit 1

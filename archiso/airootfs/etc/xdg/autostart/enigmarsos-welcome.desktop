@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=Welcome to EnigmarsOS
-Exec=enigmarsos-welcome
+Exec=sh -c "if [ -d /run/archiso ]; then exec enigmarsos-welcome; fi; command -v enigmars-util >/dev/null && exit 0; exec enigmarsos-welcome"
 Icon=enigmarsos
 Terminal=false
 Categories=System;
