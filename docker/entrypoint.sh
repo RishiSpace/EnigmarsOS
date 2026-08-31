@@ -78,6 +78,9 @@ fi
 rm -f "${PROFILE}/airootfs/usr/share/wayland-sessions/plasma.desktop"
 rm -f "${PROFILE}/airootfs/usr/share/xsessions/plasmax11.desktop"
 rm -f "${PROFILE}/airootfs/etc/security/limits.d/10-gamemode.conf"
+# enigmars-utils ships these; airootfs copies them first and pacstrap then fails
+rm -f "${PROFILE}/airootfs/usr/share/icons/hicolor/scalable/apps/enigmarsos.svg"
+rm -f "${PROFILE}/airootfs/usr/share/pixmaps/enigmarsos.png"
 
 
 # Re-apply local repo after prepare-profile (it may overwrite pacman.conf)
