@@ -1,0 +1,15 @@
+{
+    "KPackageStructure": "Plasma/Wallpaper",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Email": "rishi@rishispace.dev",
+                "Name": "EnigmarsOS"
+            }
+        ],
+        "Id": "EnigmarsOS",
+        "License": "GPL-3.0-or-later",
+        "Name": "EnigmarsOS",
+        "Website": "https://enigmarsos.rishispace.dev"
+    }
+}

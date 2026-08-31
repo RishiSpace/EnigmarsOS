@@ -19,4 +19,8 @@ theme=Breeze
 cursorTheme=breeze_cursors
 
 [Wallpaper]
-Image=file:///usr/share/enigmarsos/wallpapers/enigmarsos-amoled.png
+Image=EnigmarsOS
+defaultWallpaperTheme=EnigmarsOS
+defaultFileSuffix=.png
+defaultWidth=3840
+defaultHeight=2160

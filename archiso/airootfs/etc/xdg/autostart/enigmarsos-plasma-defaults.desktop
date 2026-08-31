@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=EnigmarsOS Plasma defaults
+Exec=/usr/local/bin/enigmarsos-plasma-defaults
+Icon=enigmarsos
+Terminal=false
+NoDisplay=true
+OnlyShowIn=KDE;
+X-KDE-autostart-phase=1
+X-KDE-autostart-after=panel
+X-GNOME-Autostart-enabled=true

@@ -13,6 +13,19 @@ fi
 if [[ -f "${ROOT}/wallpapers/enigmarsos-amoled.png" ]]; then
   install -Dm644 "${ROOT}/wallpapers/enigmarsos-amoled.png" \
     "${AIO}/usr/share/enigmarsos/wallpapers/enigmarsos-amoled.png"
+  # Plasma wallpaper package (Look and Feel Image=EnigmarsOS)
+  install -Dm644 "${ROOT}/wallpapers/enigmarsos-amoled.png" \
+    "${AIO}/usr/share/wallpapers/EnigmarsOS/contents/images/3840x2160.png"
+  install -Dm644 "${ROOT}/wallpapers/enigmarsos-amoled.png" \
+    "${AIO}/usr/share/wallpapers/EnigmarsOS/contents/screenshot.png"
+  if [[ -f "${ROOT}/themes/wallpapers/EnigmarsOS/metadata.json" ]]; then
+    install -Dm644 "${ROOT}/themes/wallpapers/EnigmarsOS/metadata.json" \
+      "${AIO}/usr/share/wallpapers/EnigmarsOS/metadata.json"
+  fi
+fi
+if [[ -f "${ROOT}/themes/plasma/color-schemes/EnigmarsOS.colors" ]]; then
+  install -Dm644 "${ROOT}/themes/plasma/color-schemes/EnigmarsOS.colors" \
+    "${AIO}/usr/share/color-schemes/EnigmarsOS.colors"
 fi
 
 # Kickoff / Application Launcher logo: thin icon theme overriding start-here-kde

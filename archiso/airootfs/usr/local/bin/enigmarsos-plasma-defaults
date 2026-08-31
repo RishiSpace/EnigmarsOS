@@ -1,0 +1,24 @@
+#!/bin/bash
+# Apply EnigmarsOS Plasma look (colors, L&F, wallpaper) once per user.
+# /etc/xdg/kdeglobals is not enough for wallpaper on first login.
+set -eu
+[[ -n "${HOME:-}" ]] || exit 0
+FLAG="${XDG_CONFIG_HOME:-$HOME/.config}/enigmarsos/plasma-defaults-applied"
+[[ -f "${FLAG}" ]] && exit 0
+
+WALL="/usr/share/wallpapers/EnigmarsOS/contents/images/3840x2160.png"
+[[ -f "${WALL}" ]] || WALL="/usr/share/enigmarsos/wallpapers/enigmarsos-amoled.png"
+
+if command -v plasma-apply-colorscheme >/dev/null 2>&1; then
+  plasma-apply-colorscheme EnigmarsOS >/dev/null 2>&1 || true
+fi
+if command -v plasma-apply-lookandfeel >/dev/null 2>&1; then
+  plasma-apply-lookandfeel -a org.enigmarsos.desktop >/dev/null 2>&1 || true
+fi
+if command -v plasma-apply-wallpaperimage >/dev/null 2>&1 && [[ -f "${WALL}" ]]; then
+  plasma-apply-wallpaperimage "${WALL}" >/dev/null 2>&1 || true
+fi
+
+mkdir -p "$(dirname "${FLAG}")"
+date -Iseconds >"${FLAG}"
+exit 0
