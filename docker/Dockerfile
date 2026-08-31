@@ -26,15 +26,18 @@ RUN useradd -m -G wheel builder \
     && mkdir -p /opt/enigmarsos-repo /home/builder/build \
     && chown -R builder:builder /opt/enigmarsos-repo /home/builder
 
-# Vendored sources (avoids flaky Codeberg downloads during image build)
-COPY cache/calamares-3.3.14.tar.gz cache/PKGBUILD.calamares /home/builder/build/
-# Build ckbcomp from AUR + calamares from vendored tarball
+# Vendored sources (salsa HTTP/2 and Codeberg are flaky in CI)
+COPY cache/calamares-3.3.14.tar.gz cache/PKGBUILD.calamares \
+     cache/console-setup-1.249.tar.gz cache/PKGBUILD.ckbcomp \
+     /home/builder/build/
 USER builder
 WORKDIR /home/builder/build
 
 RUN set -euo pipefail \
-    && git clone --depth 1 https://aur.archlinux.org/ckbcomp.git \
-    && cd ckbcomp && makepkg -s --noconfirm \
+    && mkdir -p ckbcomp && cd ckbcomp \
+    && cp ../PKGBUILD.ckbcomp PKGBUILD \
+    && cp ../console-setup-1.249.tar.gz . \
+    && makepkg -s --noconfirm \
     && sudo pacman -U --noconfirm ./*.pkg.tar.zst \
     && cp -v ./*.pkg.tar.zst /opt/enigmarsos-repo/ \
     && cd /home/builder/build \
