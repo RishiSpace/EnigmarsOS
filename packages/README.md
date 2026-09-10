@@ -7,7 +7,7 @@ These PKGBUILDs produce the meta/branding layer on top of Arch.
 | `enigmarsos-filesystem` | Identity files (`os-release`, `issue`, `motd`) |
 | `enigmarsos-settings` | Defaults: security, Plasma skel, NetworkManager |
 | `enigmarsos-artwork` | Logos, wallpapers, color schemes |
-| `enigmarsos-welcome` | Welcome Qt application |
+| `enigmarsos-welcome` | Not shipped; Enigmars Utils is the landing hub |
 | `enigmarsos-calamares-config` | Installer configuration |
 | `enigmarsos-firefox-config` | Enterprise policies (privacy + uBlock) |
 | `enigmarsos-hooks` | pacman hooks |
@@ -16,7 +16,7 @@ These PKGBUILDs produce the meta/branding layer on top of Arch.
 ## Build locally
 
 ```bash
-cd packages/enigmarsos-welcome
+cd packages/enigmarsos-filesystem
 makepkg -si
 ```
 

@@ -54,7 +54,7 @@ export ENIGMARSOS_GPG_KEY=YOUR_KEY_ID
 | `enigmarsos-filesystem` | os-release, issue, motd |
 | `enigmarsos-settings` | Plasma / security defaults |
 | `enigmarsos-artwork` | logos, wallpapers, colors |
-| `enigmarsos-welcome` | welcome app |
+| `enigmars-utils` | landing hub (cloned from GitHub at ISO build) |
 | `enigmarsos-calamares-config` | installer branding |
 | `enigmarsos-firefox-config` | Firefox policies + uBlock |
 | `enigmarsos-hooks` | pacman hooks (ESP kernel sync, …) |

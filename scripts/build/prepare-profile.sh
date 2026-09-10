@@ -79,13 +79,6 @@ if [[ -d "${ROOT}/plymouth/enigmarsos" ]]; then
   cp -a "${ROOT}/plymouth/enigmarsos" "${AIO}/usr/share/plymouth/themes/"
 fi
 
-if [[ -f "${ROOT}/packages/enigmarsos-welcome/enigmarsos-welcome" ]]; then
-  install -Dm755 "${ROOT}/packages/enigmarsos-welcome/enigmarsos-welcome" \
-    "${AIO}/usr/local/bin/enigmarsos-welcome"
-  install -Dm644 "${ROOT}/packages/enigmarsos-welcome/enigmarsos-welcome.desktop" \
-    "${AIO}/usr/share/applications/enigmarsos-welcome.desktop"
-fi
-
 # enigmars-utils owns these paths; leaving them here makes pacstrap fail
 rm -f "${AIO}/usr/share/icons/hicolor/scalable/apps/enigmarsos.svg"
 rm -f "${AIO}/usr/share/pixmaps/enigmarsos.png"

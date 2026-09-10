@@ -69,10 +69,6 @@ systemctl enable apparmor.service 2>/dev/null || true
 # Restage Limine kernels on boot/shutdown (covers Discover/PackageKit)
 systemctl enable enigmarsos-sync-esp.service 2>/dev/null || true
 
-# First-boot flag for welcome app
-mkdir -p /etc/skel/.config/enigmarsos
-echo "show=true" > /etc/skel/.config/enigmarsos/welcome.conf
-
 # Pin Enigmars Utils on the Desktop and autostart it for real users (not live)
 copy_if_different() {
   local src="$1" dest="$2" mode="$3"

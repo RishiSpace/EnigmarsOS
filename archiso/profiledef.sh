@@ -31,7 +31,6 @@ file_permissions=(
   ["/usr/local/bin/choose-mirror"]="0:0:755"
   ["/usr/local/bin/Installation_guide"]="0:0:755"
   ["/usr/local/bin/livecd-sound"]="0:0:755"
-  ["/usr/local/bin/enigmarsos-welcome"]="0:0:755"
   ["/usr/local/bin/enigmars-util-autostart"]="0:0:755"
   ["/usr/local/bin/enigmarsos-plasma-defaults"]="0:0:755"
   ["/etc/skel/Desktop/org.enigmars.Util.desktop"]="0:0:755"
