@@ -124,22 +124,16 @@ jobs:
           echo "  Remote dir: /home/frs/project/enigmaos"
 
           sudo apt-get update -qq
-          sudo apt-get install -y -qq lftp
+          sudo apt-get install -y -qq sshpass rsync
 
-          # Non-interactive SFTP via lftp (password auth)
-          # Path: /home/frs/project/enigmaos  (SourceForge file release system)
-          lftp -u "${SF_USER},${SOURCEFORGE_PASS}" "sftp://${SF_HOST}" <<EOF
-          set sftp:auto-confirm yes
-          set net:timeout 60
-          set net:max-retries 5
-          set net:reconnect-interval-base 10
-          set cmd:fail-exit true
-          cd /home/frs/project/enigmaos
-          put ${ISO} -o ${ISO_NAME}
-          put out/SHA256SUMS -o SHA256SUMS
-          ls -l
-          bye
-          EOF
+          # rsync over SSH is what SourceForge FRS documents for multi-GB files.
+          # lftp `put` often returns SSH_FX_FAILURE ("Access failed: Failure")
+          # on overwrite or a 60s stall.
+          export SSHPASS="${SOURCEFORGE_PASS}"
+          sshpass -e rsync -avP --partial --inplace \
+            -e "ssh -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/dev/null -o ServerAliveInterval=30" \
+            "${ISO}" "out/SHA256SUMS" \
+            "${SF_USER}@${SF_HOST}:/home/frs/project/enigmaos/"
 
           echo "SourceForge upload complete: ${ISO_NAME}"
           echo "Default download (after marking default on SF):"
