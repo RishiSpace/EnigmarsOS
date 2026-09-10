@@ -133,6 +133,10 @@ linux-enigmarsos-headers
 ntfs-3g
 alsa-firmware
 mesa
+nvidia-open-dkms
+nvidia-utils
+nvidia-settings
+lib32-nvidia-utils
 vulkan-radeon
 vulkan-intel
 vulkan-mesa-layers

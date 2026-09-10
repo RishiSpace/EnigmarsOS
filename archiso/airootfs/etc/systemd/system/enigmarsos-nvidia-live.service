@@ -1,0 +1,14 @@
+[Unit]
+Description=EnigmarsOS live NVIDIA GPU setup
+DefaultDependencies=no
+After=local-fs.target systemd-udev-settle.service
+Before=display-manager.service sddm.service
+ConditionPathExists=/run/archiso
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/share/enigmarsos/scripts/enigmarsos-nvidia-setup.sh live
+
+[Install]
+WantedBy=graphical.target

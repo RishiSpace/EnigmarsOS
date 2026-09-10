@@ -4,9 +4,9 @@ set -euo pipefail
 
 echo "EnigmarsOS post-install starting..."
 
-# NVIDIA: detect GPU and pacstrap drivers *before* mkinitcpio / ESP staging
+# NVIDIA: keep ISO drivers if a GPU is present, else remove them
 if [[ -x /usr/share/enigmarsos/scripts/enigmarsos-nvidia-setup.sh ]]; then
-  /usr/share/enigmarsos/scripts/enigmarsos-nvidia-setup.sh || true
+  /usr/share/enigmarsos/scripts/enigmarsos-nvidia-setup.sh install || true
 fi
 
 # Identity (hook may already have applied this)
