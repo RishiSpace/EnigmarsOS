@@ -181,6 +181,18 @@ if [[ -n "${ROOT_UUID}" ]]; then
   fi
 fi
 
+if [[ -d /etc/enigmarsos/cmdline.d ]]; then
+  extra=""
+  for f in /etc/enigmarsos/cmdline.d/*.conf; do
+    [[ -f "${f}" ]] || continue
+    extra+=" $(tr '\n' ' ' <"${f}")"
+  done
+  extra="$(echo "${extra}" | xargs)"
+  if [[ -n "${extra}" ]]; then
+    CMDLINE="${CMDLINE} ${extra}"
+  fi
+fi
+
 UCODE_BLOCK=""
 if [[ -r "${STAGE_DIR}/intel-ucode.img" ]]; then
   UCODE_BLOCK+="    module_path: boot():/EFI/EnigmarsOS/intel-ucode.img"$'\n'

@@ -4,6 +4,11 @@ set -euo pipefail
 
 echo "EnigmarsOS post-install starting..."
 
+# NVIDIA: detect GPU and pacstrap drivers *before* mkinitcpio / ESP staging
+if [[ -x /usr/share/enigmarsos/scripts/enigmarsos-nvidia-setup.sh ]]; then
+  /usr/share/enigmarsos/scripts/enigmarsos-nvidia-setup.sh || true
+fi
+
 # Identity (hook may already have applied this)
 if [[ -x /usr/local/bin/enigmarsos-branding ]]; then
   /usr/local/bin/enigmarsos-branding || true

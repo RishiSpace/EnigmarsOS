@@ -35,6 +35,7 @@ file_permissions=(
   ["/usr/local/bin/enigmarsos-plasma-defaults"]="0:0:755"
   ["/etc/skel/Desktop/org.enigmars.Util.desktop"]="0:0:755"
   ["/etc/skel/Desktop/install-enigmarsos.desktop"]="0:0:755"
+  ["/usr/share/enigmarsos/scripts/enigmarsos-nvidia-setup.sh"]="0:0:755"
   ["/usr/local/bin/enigmarsos-firstboot"]="0:0:755"
   ["/usr/local/bin/enigmarsos-setup-live-user"]="0:0:755"
 )
