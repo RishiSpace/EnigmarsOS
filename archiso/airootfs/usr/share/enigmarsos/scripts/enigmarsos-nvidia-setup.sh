@@ -7,6 +7,21 @@ set -uo pipefail
 mode="${1:-install}"
 echo "==> EnigmarsOS: NVIDIA GPU check (${mode})"
 
+pci_vga_vendors() {
+  local d vendor class
+  shopt -s nullglob
+  for d in /sys/bus/pci/devices/*; do
+    [[ -r "${d}/vendor" && -r "${d}/class" ]] || continue
+    class="$(cat "${d}/class" 2>/dev/null || true)"
+    case "${class}" in
+      0x030000|0x030200) ;;
+      *) continue ;;
+    esac
+    vendor="$(cat "${d}/vendor" 2>/dev/null || true)"
+    printf '%s\n' "${vendor}"
+  done
+}
+
 nvidia_devids() {
   local d vendor class devid
   shopt -s nullglob
@@ -25,6 +40,17 @@ nvidia_devids() {
   done
 }
 
+# Intel 8086 / AMD 1002 iGPU or APU display next to NVIDIA → hybrid (PRIME).
+has_igpu() {
+  local v
+  while IFS= read -r v; do
+    case "${v}" in
+      0x8086|0x1002) return 0 ;;
+    esac
+  done
+  return 1
+}
+
 turing_or_newer() {
   local id
   while IFS= read -r id; do
@@ -38,19 +64,35 @@ turing_or_newer() {
 }
 
 ids="$(nvidia_devids || true)"
+vga_vendors="$(pci_vga_vendors || true)"
+hybrid=0
+if [[ -n "${ids}" ]] && echo "${vga_vendors}" | has_igpu; then
+  hybrid=1
+fi
 
 write_nvidia_conf() {
+  local hybrid_mode="${1:-0}"
   mkdir -p /etc/modprobe.d /etc/mkinitcpio.conf.d /etc/enigmarsos/cmdline.d
   rm -f /etc/modprobe.d/enigmarsos-gpu.conf
-  cat >/etc/modprobe.d/nvidia.conf <<'EOF'
+  if ((hybrid_mode)); then
+    # iGPU keeps the panel; NVIDIA is offload-only (no early KMS / fbdev).
+    cat >/etc/modprobe.d/nvidia.conf <<'EOF'
+blacklist nouveau
+options nvidia-drm modeset=1
+EOF
+    rm -f /etc/mkinitcpio.conf.d/nvidia.conf
+    echo 'nvidia-drm.modeset=1' >/etc/enigmarsos/cmdline.d/nvidia.conf
+  else
+    cat >/etc/modprobe.d/nvidia.conf <<'EOF'
 blacklist nouveau
 options nvidia-drm modeset=1 fbdev=1
 EOF
-  cat >/etc/mkinitcpio.conf.d/nvidia.conf <<'EOF'
-# NVIDIA GPU detected
+    cat >/etc/mkinitcpio.conf.d/nvidia.conf <<'EOF'
+# NVIDIA-only machine (no Intel/AMD iGPU)
 MODULES+=(nvidia nvidia_modeset nvidia_uvm nvidia_drm)
 EOF
-  echo 'nvidia-drm.modeset=1 nvidia-drm.fbdev=1' >/etc/enigmarsos/cmdline.d/nvidia.conf
+    echo 'nvidia-drm.modeset=1 nvidia-drm.fbdev=1' >/etc/enigmarsos/cmdline.d/nvidia.conf
+  fi
 }
 
 if [[ "${mode}" == "live" ]]; then
@@ -59,6 +101,10 @@ if [[ "${mode}" == "live" ]]; then
     exit 0
   fi
   echo "    NVIDIA GPU device id(s): ${ids//$'\n'/ }"
+  if ((hybrid)); then
+    echo "    hybrid Intel/AMD iGPU + NVIDIA; leave iGPU as display (no early nvidia load)"
+    exit 0
+  fi
   if echo "${ids}" | turing_or_newer; then
     modprobe nvidia 2>/dev/null || true
     modprobe nvidia_modeset 2>/dev/null || true
@@ -97,6 +143,10 @@ if command -v pacman >/dev/null 2>&1; then
   pacman -Sy --noconfirm --needed "${pkgs[@]}" || \
     echo "WARNING: NVIDIA package sync failed; keeping ISO copies if present" >&2
 fi
-write_nvidia_conf
-echo "==> EnigmarsOS: NVIDIA drivers configured for installed system"
+write_nvidia_conf "${hybrid}"
+if ((hybrid)); then
+  echo "==> EnigmarsOS: NVIDIA kept for offload; iGPU remains the display GPU"
+else
+  echo "==> EnigmarsOS: NVIDIA drivers configured for installed system"
+fi
 exit 0
