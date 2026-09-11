@@ -52,6 +52,20 @@ turing_or_newer() {
   return 0
 }
 
+# Firmware boot VGA: discrete/MUX-dGPU mode sets this on NVIDIA even if
+# an Intel iGPU is still visible in PCI (and may even report eDP connected).
+boot_vga_vendor() {
+  local d
+  shopt -s nullglob
+  for d in /sys/bus/pci/devices/*; do
+    [[ -r "${d}/boot_vga" && -r "${d}/vendor" ]] || continue
+    [[ "$(cat "${d}/boot_vga" 2>/dev/null || true)" == "1" ]] || continue
+    cat "${d}/vendor" 2>/dev/null || true
+    return 0
+  done
+  return 0
+}
+
 load_igpu_kms() {
   local v
   while IFS= read -r v; do
@@ -136,29 +150,56 @@ EOF
   fi
 }
 
+prefer_nvidia_display() {
+  local boot
+  boot="$(boot_vga_vendor)"
+  case "${boot}" in
+    0x10de) return 0 ;;
+    0x8086|0x1002) return 1 ;;
+  esac
+  # No boot_vga: only treat as offload if an iGPU connector is really live.
+  if igpu_has_connected_output; then
+    return 1
+  fi
+  return 0
+}
+
+sddm_x11_for_nvidia() {
+  mkdir -p /etc/sddm.conf.d
+  cat >/etc/sddm.conf.d/20-enigmarsos-nvidia-display.conf <<'EOF'
+# Live/install: kwin_wayland --drm on NVIDIA-as-display often stays black.
+[General]
+DisplayServer=x11
+EOF
+}
+
 if [[ "${mode}" == "live" ]]; then
   if [[ -z "${ids}" ]]; then
     echo "    no NVIDIA GPU; nvidia modules stay blacklisted"
     exit 0
   fi
   echo "    NVIDIA GPU device id(s): ${ids//$'\n'/ }"
-  echo "    kernel $(uname -r)"
-  echo "${vga_vendors}" | load_igpu_kms
+  echo "    kernel $(uname -r) boot_vga=$(boot_vga_vendor)"
   fbdev=1
-  if igpu_has_connected_output; then
-    fbdev=0
-    echo "    connected Intel/AMD panel → load NVIDIA without fbdev"
+  if prefer_nvidia_display; then
+    echo "    NVIDIA is the firmware/display GPU (discrete/MUX or desktop)"
   else
-    echo "    NVIDIA is the display GPU"
+    fbdev=0
+    echo "${vga_vendors}" | load_igpu_kms
+    echo "    iGPU is boot VGA → NVIDIA offload, iGPU keeps the panel"
   fi
   if ! echo "${ids}" | turing_or_newer; then
     echo "    pre-Turing: live ISO ships nvidia-open only"
     exit 0
   fi
   if load_nvidia "${fbdev}"; then
-    echo "    nvidia modules loaded (nvidia-smi should work)"
+    echo "    nvidia modules loaded"
+    if ((fbdev)); then
+      sddm_x11_for_nvidia
+      echo "    SDDM greeter set to X11 (Wayland+NVIDIA live is often a black screen)"
+    fi
   else
-    echo "    NVIDIA failed to load; trying nouveau so the session is not stuck at 1024x768" >&2
+    echo "    NVIDIA failed to load; trying nouveau" >&2
     modprobe nouveau 2>/dev/null || true
   fi
   exit 0
@@ -178,7 +219,7 @@ fi
 echo "    NVIDIA GPU device id(s): ${ids//$'\n'/ }"
 echo "${vga_vendors}" | load_igpu_kms
 offload=0
-if igpu_has_connected_output; then
+if ! prefer_nvidia_display; then
   offload=1
 fi
 
