@@ -178,25 +178,21 @@ if [[ "${mode}" == "live" ]]; then
     echo "    no NVIDIA GPU; nvidia modules stay blacklisted"
     exit 0
   fi
-  echo "    NVIDIA GPU device id(s): ${ids//$'\n'/ }"
-  echo "    kernel $(uname -r) boot_vga=$(boot_vga_vendor)"
-  fbdev=1
+  echo "    NVIDIA GPU present (${ids//$'\n'/ }) kernel=$(uname -r) boot_vga=$(boot_vga_vendor)"
+  echo "${vga_vendors}" | load_igpu_kms
+  # Always load the NVIDIA driver when the hardware exists.
+  # fbdev=1 only if firmware boot VGA is NVIDIA, so an iGPU panel is not stolen.
+  fbdev=0
   if prefer_nvidia_display; then
-    echo "    NVIDIA is the firmware/display GPU (discrete/MUX or desktop)"
+    fbdev=1
+    echo "    NVIDIA is boot VGA → modeset+fbdev, SDDM X11"
   else
-    fbdev=0
-    echo "${vga_vendors}" | load_igpu_kms
-    echo "    iGPU is boot VGA → NVIDIA offload, iGPU keeps the panel"
-  fi
-  if ! echo "${ids}" | turing_or_newer; then
-    echo "    pre-Turing: live ISO ships nvidia-open only"
-    exit 0
+    echo "    iGPU is boot VGA → still load nvidia (offload / nvidia-smi), no fbdev"
   fi
   if load_nvidia "${fbdev}"; then
     echo "    nvidia modules loaded"
     if ((fbdev)); then
       sddm_x11_for_nvidia
-      echo "    SDDM greeter set to X11 (Wayland+NVIDIA live is often a black screen)"
     fi
   else
     echo "    NVIDIA failed to load; trying nouveau" >&2
