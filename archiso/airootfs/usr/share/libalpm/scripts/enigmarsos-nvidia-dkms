@@ -1,0 +1,41 @@
+#!/bin/bash
+# After nvidia-open-dkms: retry DKMS (pacstrap may have run it with no
+# os-release) and fail the transaction if nvidia.ko is missing.
+set -euo pipefail
+
+if ! pacman -Qq nvidia-open-dkms >/dev/null 2>&1 && ! pacman -Qq nvidia-dkms >/dev/null 2>&1; then
+  exit 0
+fi
+
+if [[ ! -e /etc/os-release ]]; then
+  if [[ -e /usr/lib/os-release ]]; then
+    rm -f /etc/os-release
+    cp -f /usr/lib/os-release /etc/os-release
+  else
+    echo "ERROR: /etc/os-release missing; DKMS cannot build NVIDIA modules" >&2
+    exit 1
+  fi
+fi
+
+dkms autoinstall || true
+
+missing=0
+for kdir in /usr/lib/modules/*; do
+  [[ -d "${kdir}/build" ]] || continue
+  kver="$(basename "${kdir}")"
+  if ! find "${kdir}" \( -name 'nvidia.ko' -o -name 'nvidia.ko.*' \) 2>/dev/null | grep -q .; then
+    echo "ERROR: nvidia.ko missing for kernel ${kver} after dkms autoinstall" >&2
+    missing=1
+  else
+    echo "==> nvidia.ko present for ${kver}"
+  fi
+done
+
+if pacman -Qq linux-enigmarsos >/dev/null 2>&1; then
+  if ! find /usr/lib/modules/*enigmarsos* \( -name 'nvidia.ko' -o -name 'nvidia.ko.*' \) 2>/dev/null | grep -q .; then
+    echo "ERROR: nvidia.ko missing for linux-enigmarsos (live default kernel)" >&2
+    missing=1
+  fi
+fi
+
+exit "${missing}"

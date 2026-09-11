@@ -110,8 +110,8 @@ mkdir -p "${WORK}"
 export SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:-$(date +%s)}"
 
 
-# Identity files must not preexist — filesystem package owns them; branding hook rewrites them.
-rm -f "${PROFILE}/airootfs/etc/os-release" "${PROFILE}/airootfs/usr/lib/os-release"
+# os-release is shipped in airootfs (NoExtract). Do not delete it: DKMS
+# needs /etc/os-release while pacstrap installs nvidia-open-dkms.
 
 echo "==> mkarchiso"
 mkarchiso -v -w "${WORK}" -o "${OUT}" "${PROFILE}"

@@ -1,0 +1,12 @@
+NAME="EnigmarsOS"
+PRETTY_NAME="EnigmarsOS"
+ID=enigmarsos
+ID_LIKE=arch
+BUILD_ID=rolling
+ANSI_COLOR="0;36"
+HOME_URL="https://enigmarsos.rishispace.dev/"
+DOCUMENTATION_URL="https://enigmarsos.rishispace.dev/docs/"
+SUPPORT_URL="https://github.com/RishiSpace/EnigmarsOS/issues"
+BUG_REPORT_URL="https://github.com/RishiSpace/EnigmarsOS/issues"
+PRIVACY_POLICY_URL="https://enigmarsos.rishispace.dev/privacy"
+LOGO=enigmarsos

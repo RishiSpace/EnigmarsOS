@@ -99,5 +99,5 @@ echo "==> Profile prepared"
 rm -f "${AIO}/usr/share/wayland-sessions/plasma.desktop"
 rm -f "${AIO}/usr/share/xsessions/plasmax11.desktop"
 rm -f "${AIO}/etc/security/limits.d/10-gamemode.conf"
-# Keep /etc/os-release + usr/lib/os-release; pacman NoExtract protects them
-rm -f "${AIO}/etc/os-release" "${AIO}/usr/lib/os-release"
+# os-release must exist *during* pacstrap: DKMS (nvidia-open) refuses to
+# build without it. NoExtract keeps filesystem from overwriting these.

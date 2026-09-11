@@ -23,6 +23,7 @@ file_permissions=(
   ["/usr/share/enigmarsos/scripts/post-install.sh"]="0:0:755"
   ["/usr/local/bin/enigmarsos-branding"]="0:0:755"
   ["/usr/share/libalpm/scripts/enigmarsos-os-release"]="0:0:755"
+  ["/usr/share/libalpm/scripts/enigmarsos-nvidia-dkms"]="0:0:755"
   ["/usr/share/libalpm/scripts/enigmarsos-sync-esp"]="0:0:755"
   ["/etc/shadow"]="0:0:400"
   ["/root"]="0:0:750"
