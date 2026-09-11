@@ -3,6 +3,11 @@
 # os-release) and fail the transaction if nvidia.ko is missing.
 set -euo pipefail
 
+# ISO pacstrap only. Installed systems keep Arch's 70-dkms-install.hook.
+if [[ ! -f /etc/enigmarsos/iso-build ]]; then
+  exit 0
+fi
+
 if ! pacman -Qq nvidia-open-dkms >/dev/null 2>&1 && ! pacman -Qq nvidia-dkms >/dev/null 2>&1; then
   exit 0
 fi

@@ -4,6 +4,10 @@ set -euo pipefail
 
 echo "EnigmarsOS post-install starting..."
 
+# Drop ISO-only NVIDIA DKMS fail-hard hook before any pacman -S on the target
+rm -f /etc/enigmarsos/iso-build \
+      /etc/pacman.d/hooks/zz-enigmarsos-nvidia-dkms.hook
+
 # NVIDIA: keep ISO drivers if a GPU is present, else remove them
 if [[ -x /usr/share/enigmarsos/scripts/enigmarsos-nvidia-setup.sh ]]; then
   /usr/share/enigmarsos/scripts/enigmarsos-nvidia-setup.sh install || true
