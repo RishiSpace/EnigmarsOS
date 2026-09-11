@@ -1,0 +1,14 @@
+# Filename 00- so this runs before 70-dkms-install.hook in the same
+# pacstrap PostTransaction (DKMS needs /etc/os-release).
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = base
+Target = nvidia-open-dkms
+Target = nvidia-dkms
+
+[Action]
+Description = Applying EnigmarsOS os-release (before DKMS)...
+When = PostTransaction
+Exec = /usr/share/libalpm/scripts/enigmarsos-os-release
