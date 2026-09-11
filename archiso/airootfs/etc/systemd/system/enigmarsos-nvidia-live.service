@@ -1,7 +1,7 @@
 [Unit]
 Description=EnigmarsOS live NVIDIA GPU setup
 DefaultDependencies=no
-After=local-fs.target systemd-udev-settle.service
+After=local-fs.target systemd-udevd.service
 Before=display-manager.service sddm.service
 ConditionPathExists=/run/archiso
 

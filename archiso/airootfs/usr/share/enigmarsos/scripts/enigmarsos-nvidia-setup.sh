@@ -40,17 +40,6 @@ nvidia_devids() {
   done
 }
 
-# Intel 8086 / AMD 1002 iGPU or APU display next to NVIDIA → hybrid (PRIME).
-has_igpu() {
-  local v
-  while IFS= read -r v; do
-    case "${v}" in
-      0x8086|0x1002) return 0 ;;
-    esac
-  done
-  return 1
-}
-
 turing_or_newer() {
   local id
   while IFS= read -r id; do
@@ -63,19 +52,71 @@ turing_or_newer() {
   return 0
 }
 
+load_igpu_kms() {
+  local v
+  while IFS= read -r v; do
+    case "${v}" in
+      0x8086)
+        modprobe i915 2>/dev/null || true
+        modprobe xe 2>/dev/null || true
+        ;;
+      0x1002)
+        modprobe amdgpu 2>/dev/null || true
+        ;;
+    esac
+  done
+  if command -v udevadm >/dev/null 2>&1; then
+    udevadm settle -t 8 >/dev/null 2>&1 || true
+  fi
+}
+
+# Laptop panel on Intel/AMD. A desktop Intel iGPU with no cable is ignored.
+igpu_has_connected_output() {
+  local conn card vendor st
+  shopt -s nullglob
+  for conn in /sys/class/drm/card*-*; do
+    [[ -f "${conn}/status" ]] || continue
+    st="$(cat "${conn}/status" 2>/dev/null || true)"
+    [[ "${st}" == "connected" ]] || continue
+    card="/sys/class/drm/$(basename "${conn}" | sed 's/-.*//')"
+    vendor="$(cat "${card}/device/vendor" 2>/dev/null || true)"
+    case "${vendor}" in
+      0x8086|0x1002) return 0 ;;
+    esac
+  done
+  return 1
+}
+
+load_nvidia() {
+  local with_fbdev="${1:-0}"
+  local kver
+  kver="$(uname -r)"
+  if ! modinfo nvidia >/dev/null 2>&1; then
+    echo "    ERROR: nvidia.ko not found for kernel ${kver}" >&2
+    return 1
+  fi
+  if ! modprobe nvidia; then
+    echo "    ERROR: modprobe nvidia failed (Secure Boot unsigned module?)" >&2
+    return 1
+  fi
+  modprobe nvidia_modeset 2>/dev/null || true
+  modprobe nvidia_uvm 2>/dev/null || true
+  if ((with_fbdev)); then
+    modprobe nvidia_drm modeset=1 fbdev=1 || return 1
+  else
+    modprobe nvidia_drm modeset=1 || return 1
+  fi
+  return 0
+}
+
 ids="$(nvidia_devids || true)"
 vga_vendors="$(pci_vga_vendors || true)"
-hybrid=0
-if [[ -n "${ids}" ]] && echo "${vga_vendors}" | has_igpu; then
-  hybrid=1
-fi
 
 write_nvidia_conf() {
-  local hybrid_mode="${1:-0}"
+  local offload="${1:-0}"
   mkdir -p /etc/modprobe.d /etc/mkinitcpio.conf.d /etc/enigmarsos/cmdline.d
   rm -f /etc/modprobe.d/enigmarsos-gpu.conf
-  if ((hybrid_mode)); then
-    # iGPU keeps the panel; NVIDIA is offload-only (no early KMS / fbdev).
+  if ((offload)); then
     cat >/etc/modprobe.d/nvidia.conf <<'EOF'
 blacklist nouveau
 options nvidia-drm modeset=1
@@ -88,7 +129,7 @@ blacklist nouveau
 options nvidia-drm modeset=1 fbdev=1
 EOF
     cat >/etc/mkinitcpio.conf.d/nvidia.conf <<'EOF'
-# NVIDIA-only machine (no Intel/AMD iGPU)
+# NVIDIA owns the display (no connected Intel/AMD panel)
 MODULES+=(nvidia nvidia_modeset nvidia_uvm nvidia_drm)
 EOF
     echo 'nvidia-drm.modeset=1 nvidia-drm.fbdev=1' >/etc/enigmarsos/cmdline.d/nvidia.conf
@@ -101,18 +142,24 @@ if [[ "${mode}" == "live" ]]; then
     exit 0
   fi
   echo "    NVIDIA GPU device id(s): ${ids//$'\n'/ }"
-  if ((hybrid)); then
-    echo "    hybrid Intel/AMD iGPU + NVIDIA; leave iGPU as display (no early nvidia load)"
+  echo "    kernel $(uname -r)"
+  echo "${vga_vendors}" | load_igpu_kms
+  fbdev=1
+  if igpu_has_connected_output; then
+    fbdev=0
+    echo "    connected Intel/AMD panel → load NVIDIA without fbdev"
+  else
+    echo "    NVIDIA is the display GPU"
+  fi
+  if ! echo "${ids}" | turing_or_newer; then
+    echo "    pre-Turing: live ISO ships nvidia-open only"
     exit 0
   fi
-  if echo "${ids}" | turing_or_newer; then
-    modprobe nvidia 2>/dev/null || true
-    modprobe nvidia_modeset 2>/dev/null || true
-    modprobe nvidia_uvm 2>/dev/null || true
-    modprobe nvidia_drm modeset=1 fbdev=1 2>/dev/null || true
-    echo "    loaded nvidia-open modules for live session"
+  if load_nvidia "${fbdev}"; then
+    echo "    nvidia modules loaded (nvidia-smi should work)"
   else
-    echo "    pre-Turing GPU: live ISO ships nvidia-open only; using whatever KMS is available"
+    echo "    NVIDIA failed to load; trying nouveau so the session is not stuck at 1024x768" >&2
+    modprobe nouveau 2>/dev/null || true
   fi
   exit 0
 fi
@@ -129,6 +176,12 @@ if [[ -z "${ids}" ]]; then
 fi
 
 echo "    NVIDIA GPU device id(s): ${ids//$'\n'/ }"
+echo "${vga_vendors}" | load_igpu_kms
+offload=0
+if igpu_has_connected_output; then
+  offload=1
+fi
+
 pkgs=(nvidia-utils nvidia-settings lib32-nvidia-utils)
 if echo "${ids}" | turing_or_newer; then
   pkgs+=(nvidia-open-dkms)
@@ -143,10 +196,10 @@ if command -v pacman >/dev/null 2>&1; then
   pacman -Sy --noconfirm --needed "${pkgs[@]}" || \
     echo "WARNING: NVIDIA package sync failed; keeping ISO copies if present" >&2
 fi
-write_nvidia_conf "${hybrid}"
-if ((hybrid)); then
+write_nvidia_conf "${offload}"
+if ((offload)); then
   echo "==> EnigmarsOS: NVIDIA kept for offload; iGPU remains the display GPU"
 else
-  echo "==> EnigmarsOS: NVIDIA drivers configured for installed system"
+  echo "==> EnigmarsOS: NVIDIA drivers configured as the display GPU"
 fi
 exit 0
