@@ -64,9 +64,23 @@ if [[ -x "${ROOT}/scripts/build/prepare-profile.sh" ]]; then
   bash "${ROOT}/scripts/build/prepare-profile.sh"
 fi
 
-# enigmars-utils from GitHub → enigmarsos-local (not on Arch extra)
+# enigmars-utils from GitHub → enigmarsos-local (ISO fallback if extras
+# is missing that package). extras is preferred when both list it.
 if [[ -x "${ROOT}/scripts/build/build-enigmars-utils-pkg.sh" ]]; then
   bash "${ROOT}/scripts/build/build-enigmars-utils-pkg.sh"
+fi
+
+# extras snapshot from prepare-profile → container pacman (pacman -Si checks)
+if [[ -d /build/repo-extras/x86_64 ]] && [[ -f /build/repo-extras/x86_64/enigmars-extras.db || -f /build/repo-extras/x86_64/enigmars-extras.db.tar.gz ]]; then
+  if ! grep -q '^\[enigmars-extras\]' /etc/pacman.conf; then
+    cat >>/etc/pacman.conf <<'EOF'
+
+[enigmars-extras]
+SigLevel = Optional TrustAll
+Server = file:///build/repo-extras/x86_64
+Server = https://github.com/RishiSpace/enigmars-extras/releases/latest/download
+EOF
+  fi
 fi
 
 # Keep branding files from being overwritten by package extraction

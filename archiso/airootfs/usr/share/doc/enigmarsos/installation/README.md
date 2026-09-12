@@ -70,6 +70,9 @@ Installed systems use **[Limine](https://github.com/Limine-Bootloader/Limine)**:
 - Config: `limine.conf` on the ESP (also under `EFI/EnigmarsOS/`)
 - Default kernel is **`linux-enigmarsos`** (Arch + BORE) from the GitHub
   Releases pacman mirror. Stock **`linux`** stays installed as fallback.
+  **`enigmars-utils`** and other extras come from the
+  [`enigmars-extras`](https://github.com/RishiSpace/enigmars-extras) mirror
+  (`pacman -Syyu` after install).
 - Kernels are **staged onto the ESP** (`EFI/EnigmarsOS/vmlinuz-*`) because Limine
   cannot read btrfs. A pacman hook runs `sync-esp-boot.sh` after every
   `linux` / `linux-enigmarsos` / initramfs update so the ESP never keeps a stale kernel.

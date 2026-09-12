@@ -2,6 +2,7 @@
 work/
 out/
 repo/
+repo-extras/
 *.iso
 *.img
 *.sfs

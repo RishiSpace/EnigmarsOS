@@ -53,6 +53,24 @@ if [[ ! -f "${ROOT}/repo/x86_64/linux-enigmarsos.db" && ! -f "${ROOT}/repo/x86_6
         ls -lh'
 fi
 
+if [[ ! -f "${ROOT}/repo-extras/x86_64/enigmars-extras.db" && ! -f "${ROOT}/repo-extras/x86_64/enigmars-extras.db.tar.gz" ]]; then
+  echo "==> Building enigmars-extras.db inside Arch container"
+  docker run --rm --privileged -v "${ROOT}:/build" -w /build/repo-extras/x86_64 --entrypoint bash "${IMAGE_NAME}" \
+    -c 'set -euo pipefail
+        shopt -s nullglob
+        pkgs=(*.pkg.tar.zst)
+        ((${#pkgs[@]})) || { echo "no extras packages in /build/repo-extras/x86_64" >&2; exit 1; }
+        repo-add --new --remove enigmars-extras.db.tar.gz "${pkgs[@]}"
+        for stem in enigmars-extras.db enigmars-extras.files; do
+          if [[ -L "${stem}" ]]; then
+            cp -a "$(readlink -f "${stem}")" "${stem}.real"
+            rm -f "${stem}"
+            mv "${stem}.real" "${stem}"
+          fi
+        done
+        ls -lh'
+fi
+
 DOCKER_ARGS=(
   --rm
   --privileged

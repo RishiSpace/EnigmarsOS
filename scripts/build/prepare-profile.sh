@@ -90,6 +90,8 @@ chmod +x "${ROOT}/archiso/profiledef.sh"
 
 # Snapshot linux-enigmarsos from GitHub Latest into file:///build/repo/x86_64
 bash "${ROOT}/scripts/build/fetch-kernel-repo.sh"
+# Snapshot enigmars-extras (Utils, …) into file:///build/repo-extras/x86_64
+bash "${ROOT}/scripts/build/fetch-extras-repo.sh"
 
 # Identity applied via pacman hook enigmarsos-os-release (avoids filesystem package conflict)
 

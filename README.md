@@ -2,7 +2,7 @@
 
 Arch-based Linux with KDE Plasma 6. Privacy defaults, Calamares installer, Limine on the installed system.
 
-Default kernel is [`linux-enigmarsos`](https://github.com/RishiSpace/linux-enigmarsos) (Arch + BORE). Stock `linux` stays around as a fallback.
+Default kernel is [`linux-enigmarsos`](https://github.com/RishiSpace/linux-enigmarsos) (Arch + BORE). Stock `linux` stays around as a fallback. Userspace extras ([`enigmars-extras`](https://github.com/RishiSpace/enigmars-extras), including Utils) use the same GitHub Releases pacman mirror.
 
 ## Layout
 
@@ -54,7 +54,7 @@ export ENIGMARSOS_GPG_KEY=YOUR_KEY_ID
 | `enigmarsos-filesystem` | os-release, issue, motd |
 | `enigmarsos-settings` | Plasma / security defaults |
 | `enigmarsos-artwork` | logos, wallpapers, colors |
-| `enigmars-utils` | landing hub (cloned from GitHub at ISO build) |
+| `enigmars-utils` | landing hub ([enigmars-extras](https://github.com/RishiSpace/enigmars-extras) pacman repo) |
 | `enigmarsos-calamares-config` | installer branding |
 | `enigmarsos-firefox-config` | Firefox policies + uBlock |
 | `enigmarsos-hooks` | pacman hooks (ESP kernel sync, …) |
