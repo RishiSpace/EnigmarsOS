@@ -9,5 +9,4 @@ Target = nvidia-dkms
 Description = Building NVIDIA DKMS modules (required for live ISO)...
 When = PostTransaction
 Depends = dkms
-AbortOnFail
 Exec = /usr/share/libalpm/scripts/enigmarsos-nvidia-dkms

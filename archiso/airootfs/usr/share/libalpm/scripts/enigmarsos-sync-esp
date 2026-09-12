@@ -14,6 +14,11 @@ if [[ ! -x "${SCRIPT}" ]]; then
   exit 1
 fi
 
+# mkarchiso pacstrap: no ESP, and /run/archiso does not exist yet.
+if [[ -f /etc/enigmarsos/iso-build ]]; then
+  exit 0
+fi
+
 # Skip mkarchiso / packaging chroots with no real firmware + no fstab
 if [[ ! -d /sys/firmware ]] && [[ ! -e /etc/fstab ]]; then
   exit 0

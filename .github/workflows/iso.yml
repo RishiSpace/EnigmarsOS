@@ -52,6 +52,34 @@ jobs:
           # Full image build (includes Calamares) then mkarchiso
           ./scripts/build/docker-build-iso.sh
 
+      # make.log lives in the mkarchiso chroot (work/), which is
+      # discarded with the runner. The hook already prints its tail
+      # into the job log; this keeps the full file for diagnosis.
+      - name: Collect DKMS failure logs
+        if: failure()
+        run: |
+          set -euo pipefail
+          sudo chown -R "$(id -u):$(id -g)" work 2>/dev/null || true
+          mkdir -p failure-logs
+          shopt -s nullglob
+          logs=(work/x86_64/airootfs/var/lib/dkms/nvidia/*/build/make.log)
+          if ((${#logs[@]})); then
+            for log in "${logs[@]}"; do
+              cp -v "${log}" "failure-logs/$(echo "${log}" | tr '/' '_')" || true
+            done
+          else
+            echo "no nvidia make.log found under work/" | tee failure-logs/NONE-FOUND.txt
+          fi
+          ls -lh failure-logs/
+
+      - name: Upload DKMS failure logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dkms-failure-logs
+          path: failure-logs/
+          retention-days: 14
+
       - name: Checksums
         run: |
           set -euo pipefail

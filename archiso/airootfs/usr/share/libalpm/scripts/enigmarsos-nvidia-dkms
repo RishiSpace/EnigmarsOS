@@ -1,6 +1,7 @@
 #!/bin/bash
-# After nvidia-open-dkms: retry DKMS (pacstrap may have run it with no
-# os-release) and fail the transaction if nvidia.ko is missing.
+# After nvidia-open-dkms: retry DKMS for chroot kernels that have headers.
+# Pacman's AbortOnFail is ignored on PostTransaction hooks — the ISO
+# builder (docker/entrypoint.sh) fails the job if nvidia.ko is still missing.
 set -euo pipefail
 
 # ISO pacstrap only. Installed systems keep Arch's 70-dkms-install.hook.
@@ -22,14 +23,45 @@ if [[ ! -e /etc/os-release ]]; then
   fi
 fi
 
-dkms autoinstall || true
+dump_nvidia_logs() {
+  local log
+  shopt -s nullglob
+  for log in /var/lib/dkms/nvidia/*/build/make.log; do
+    echo "==> ${log} (last 120 lines)" >&2
+    tail -n 120 "${log}" >&2 || true
+  done
+  shopt -u nullglob
+}
+
+# Do not use `dkms autoinstall`: in the GHA container uname -r is the
+# Ubuntu host (e.g. 6.17.0-*-azure), which has no headers in the chroot.
+shopt -s nullglob
+nvidia_src=(/usr/src/nvidia-*)
+shopt -u nullglob
+if ((${#nvidia_src[@]})); then
+  ver="${nvidia_src[0]##*/nvidia-}"
+  for kdir in /usr/lib/modules/*; do
+    [[ -d "${kdir}/build" ]] || continue
+    kver="$(basename "${kdir}")"
+    [[ "${kver}" == *azure* ]] && continue
+    echo "==> dkms install nvidia/${ver} -k ${kver}"
+    if ! dkms install "nvidia/${ver}" -k "${kver}"; then
+      echo "ERROR: dkms install nvidia/${ver} failed for ${kver}" >&2
+      dump_nvidia_logs
+    fi
+  done
+else
+  dkms autoinstall || true
+  dump_nvidia_logs
+fi
 
 missing=0
 for kdir in /usr/lib/modules/*; do
   [[ -d "${kdir}/build" ]] || continue
   kver="$(basename "${kdir}")"
+  [[ "${kver}" == *azure* ]] && continue
   if ! find "${kdir}" \( -name 'nvidia.ko' -o -name 'nvidia.ko.*' \) 2>/dev/null | grep -q .; then
-    echo "ERROR: nvidia.ko missing for kernel ${kver} after dkms autoinstall" >&2
+    echo "ERROR: nvidia.ko missing for kernel ${kver} after dkms install" >&2
     missing=1
   else
     echo "==> nvidia.ko present for ${kver}"
@@ -43,4 +75,7 @@ if pacman -Qq linux-enigmarsos >/dev/null 2>&1; then
   fi
 fi
 
+if [[ "${missing}" -ne 0 ]]; then
+  dump_nvidia_logs
+fi
 exit "${missing}"

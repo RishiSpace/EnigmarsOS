@@ -130,6 +130,32 @@ export SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:-$(date +%s)}"
 echo "==> mkarchiso"
 mkarchiso -v -w "${WORK}" -o "${OUT}" "${PROFILE}"
 
+# Pacman ignores AbortOnFail on PostTransaction hooks, so a missing
+# nvidia.ko still produces an ISO. Fail the job instead of uploading it.
+iso_has_enigmarsos_nvidia() {
+  local root="${WORK}/x86_64/airootfs"
+  local sfs="${WORK}/iso/arch/x86_64/airootfs.sfs"
+  if [[ -d "${root}/usr/lib/modules" ]] && \
+     find "${root}/usr/lib/modules" -path '*enigmarsos*' \( -name 'nvidia.ko' -o -name 'nvidia.ko.*' \) 2>/dev/null | grep -q .; then
+    return 0
+  fi
+  if [[ -f "${sfs}" ]] && command -v unsquashfs >/dev/null 2>&1 && \
+     unsquashfs -l "${sfs}" 2>/dev/null | grep -E 'enigmarsos.*/nvidia\.ko' | grep -q .; then
+    return 0
+  fi
+  return 1
+}
+
+echo "==> Verifying nvidia.ko for linux-enigmarsos (live default kernel)"
+if ! iso_has_enigmarsos_nvidia; then
+  echo "ERROR: ISO is missing nvidia.ko for linux-enigmarsos." >&2
+  echo "       nvidia-open-dkms failed to build against that kernel." >&2
+  echo "       Not publishing this image." >&2
+  rm -f "${OUT}"/*.iso "${OUT}"/SHA256SUMS
+  exit 1
+fi
+echo "==> nvidia.ko present for linux-enigmarsos"
+
 echo "==> checksums"
 (
   cd "${OUT}"

@@ -25,6 +25,8 @@ test -f "${ROOT}/archiso/airootfs/usr/share/enigmarsos/scripts/enigmarsos-nvidia
 test -f "${ROOT}/archiso/airootfs/usr/share/libalpm/scripts/enigmarsos-nvidia-dkms"
 test -f "${ROOT}/archiso/airootfs/etc/pacman.d/hooks/zz-enigmarsos-nvidia-dkms.hook"
 test -f "${ROOT}/archiso/airootfs/etc/enigmarsos/iso-build"
+grep -q 'iso-build' "${ROOT}/archiso/airootfs/usr/share/libalpm/scripts/enigmarsos-sync-esp"
+grep -q 'iso_has_enigmarsos_nvidia' "${ROOT}/docker/entrypoint.sh"
 grep -q '^nvidia-open-dkms$' "${ROOT}/packages.x86_64"
 test -f "${ROOT}/archiso/airootfs/etc/systemd/system/enigmarsos-nvidia-live.service"
 test -f "${ROOT}/archiso/airootfs/etc/skel/Desktop/org.enigmars.Util.desktop"

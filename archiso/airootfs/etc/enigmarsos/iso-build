@@ -1,3 +1,3 @@
 # Present only in the ISO squashfs / mkarchiso chroot.
-# Removed by Calamares post-install so NVIDIA DKMS AbortOnFail
-# does not run on installed systems.
+# Removed by Calamares post-install so ISO-only NVIDIA DKMS and
+# ESP-skip logic do not run on installed systems.
