@@ -68,14 +68,16 @@ Installed systems use **[Limine](https://github.com/Limine-Bootloader/Limine)**:
 - UEFI: `EFI/EnigmarsOS/BOOTX64.EFI` (+ fallback `EFI/BOOT/BOOTX64.EFI`)
 - BIOS: `limine bios-install` on the target disk + `limine-bios.sys`
 - Config: `limine.conf` on the ESP (also under `EFI/EnigmarsOS/`)
-- Default kernel is **`linux-enigmarsos`** (Arch + BORE) from the GitHub
-  Releases pacman mirror. Stock **`linux`** stays installed as fallback.
+- Live USB boots **`linux-enigmarsos-lts`** (BORE, x86-64-v2). Calamares
+  installs rolling **`linux-enigmarsos`** (v3) from packages on the ISO
+  (works offline). LTS stays as the Limine fallback. There is no stock
+  Arch `linux` kernel.
   **`enigmars-utils`** and other extras come from the
   [`enigmars-extras`](https://github.com/RishiSpace/enigmars-extras) mirror
   (`pacman -Syyu` after install).
 - Kernels are **staged onto the ESP** (`EFI/EnigmarsOS/vmlinuz-*`) because Limine
   cannot read btrfs. A pacman hook runs `sync-esp-boot.sh` after every
-  `linux` / `linux-enigmarsos` / initramfs update so the ESP never keeps a stale kernel.
+  `linux-enigmarsos` / `linux-enigmarsos-lts` / initramfs update so the ESP never keeps a stale kernel.
 
 The live USB still boots with Syslinux (BIOS) / systemd-boot (UEFI) because
 `mkarchiso` does not provide Limine bootmodes; only the **installed** OS uses Limine.

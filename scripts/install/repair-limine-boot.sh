@@ -87,8 +87,9 @@ if [[ -f "${MNT}/etc/fstab" ]]; then
   fi
 fi
 
-[[ -r "${MNT}/boot/vmlinuz-linux" ]] || die "no ${MNT}/boot/vmlinuz-linux — install incomplete?"
-[[ -r "${MNT}/boot/initramfs-linux.img" ]] || die "no initramfs-linux.img"
+if [[ ! -r "${MNT}/boot/vmlinuz-linux-enigmarsos" && ! -r "${MNT}/boot/vmlinuz-linux-enigmarsos-lts" ]]; then
+  die "no ${MNT}/boot/vmlinuz-linux-enigmarsos{,-lts} — install incomplete?"
+fi
 
 STAGE="${MNT}/boot/efi/EFI/EnigmarsOS"
 mkdir -p "${STAGE}" "${MNT}/boot/efi/EFI/BOOT"
@@ -105,10 +106,12 @@ if [[ -x "${MNT}/usr/share/enigmarsos/scripts/sync-esp-boot.sh" ]]; then
 fi
 
 echo "    Copying kernel + initramfs to ESP..."
-cp -a "${MNT}/boot/vmlinuz-linux" "${STAGE}/vmlinuz-linux"
-cp -a "${MNT}/boot/initramfs-linux.img" "${STAGE}/initramfs-linux.img"
-[[ -r "${MNT}/boot/initramfs-linux-fallback.img" ]] && \
-  cp -a "${MNT}/boot/initramfs-linux-fallback.img" "${STAGE}/initramfs-linux-fallback.img"
+shopt -s nullglob
+for f in "${MNT}/boot"/vmlinuz-linux-enigmarsos* "${MNT}/boot"/initramfs-linux-enigmarsos*.img; do
+  [[ -r "${f}" ]] || continue
+  cp -a "${f}" "${STAGE}/$(basename "${f}")"
+done
+shopt -u nullglob
 [[ -r "${MNT}/boot/amd-ucode.img" ]] && cp -a "${MNT}/boot/amd-ucode.img" "${STAGE}/amd-ucode.img"
 [[ -r "${MNT}/boot/intel-ucode.img" ]] && cp -a "${MNT}/boot/intel-ucode.img" "${STAGE}/intel-ucode.img"
 
@@ -146,9 +149,13 @@ UCODE_LINES=""
 [[ -f "${STAGE}/intel-ucode.img" ]] && UCODE_LINES+="    module_path: boot():/EFI/EnigmarsOS/intel-ucode.img"$'\n'
 [[ -f "${STAGE}/amd-ucode.img" ]] && UCODE_LINES+="    module_path: boot():/EFI/EnigmarsOS/amd-ucode.img"$'\n'
 
-FALLBACK_MODULE="boot():/EFI/EnigmarsOS/initramfs-linux.img"
-[[ -f "${STAGE}/initramfs-linux-fallback.img" ]] && \
-  FALLBACK_MODULE="boot():/EFI/EnigmarsOS/initramfs-linux-fallback.img"
+DEFAULT_PKG="linux-enigmarsos-lts"
+[[ -f "${STAGE}/vmlinuz-linux-enigmarsos" ]] && DEFAULT_PKG="linux-enigmarsos"
+FALLBACK_PKG="linux-enigmarsos-lts"
+[[ "${DEFAULT_PKG}" == "linux-enigmarsos-lts" ]] && FALLBACK_PKG=""
+FALLBACK_INIT="boot():/EFI/EnigmarsOS/initramfs-${DEFAULT_PKG}.img"
+[[ -f "${STAGE}/initramfs-${DEFAULT_PKG}-fallback.img" ]] && \
+  FALLBACK_INIT="boot():/EFI/EnigmarsOS/initramfs-${DEFAULT_PKG}-fallback.img"
 
 write_conf() {
   local dest="$1"
@@ -164,14 +171,14 @@ term_background: 000000
 /+EnigmarsOS
 //EnigmarsOS
     protocol: linux
-    path: boot():/EFI/EnigmarsOS/vmlinuz-linux
-${UCODE_LINES}    module_path: boot():/EFI/EnigmarsOS/initramfs-linux.img
+    path: boot():/EFI/EnigmarsOS/vmlinuz-${DEFAULT_PKG}
+${UCODE_LINES}    module_path: boot():/EFI/EnigmarsOS/initramfs-${DEFAULT_PKG}.img
     cmdline: ${CMDLINE}
 
 //EnigmarsOS (fallback initramfs)
     protocol: linux
-    path: boot():/EFI/EnigmarsOS/vmlinuz-linux
-${UCODE_LINES}    module_path: ${FALLBACK_MODULE}
+    path: boot():/EFI/EnigmarsOS/vmlinuz-${DEFAULT_PKG}
+${UCODE_LINES}    module_path: ${FALLBACK_INIT}
     cmdline: ${CMDLINE}
 
 /+Advanced options

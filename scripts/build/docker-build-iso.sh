@@ -40,10 +40,28 @@ if [[ ! -f "${ROOT}/repo/x86_64/linux-enigmarsos.db" && ! -f "${ROOT}/repo/x86_6
   docker run --rm --privileged -v "${ROOT}:/build" -w /build/repo/x86_64 --entrypoint bash "${IMAGE_NAME}" \
     -c 'set -euo pipefail
         shopt -s nullglob
-        pkgs=(linux-enigmarsos-*.pkg.tar.zst)
+        pkgs=(linux-enigmarsos-[0-9]*.pkg.tar.zst linux-enigmarsos-headers-*.pkg.tar.zst)
         ((${#pkgs[@]})) || { echo "no kernel packages in /build/repo/x86_64" >&2; exit 1; }
         repo-add --new --remove linux-enigmarsos.db.tar.gz "${pkgs[@]}"
         for stem in linux-enigmarsos.db linux-enigmarsos.files; do
+          if [[ -L "${stem}" ]]; then
+            cp -a "$(readlink -f "${stem}")" "${stem}.real"
+            rm -f "${stem}"
+            mv "${stem}.real" "${stem}"
+          fi
+        done
+        ls -lh'
+fi
+
+if [[ ! -f "${ROOT}/repo-lts/x86_64/linux-enigmarsos-lts.db" && ! -f "${ROOT}/repo-lts/x86_64/linux-enigmarsos-lts.db.tar.gz" ]]; then
+  echo "==> Building linux-enigmarsos-lts.db inside Arch container"
+  docker run --rm --privileged -v "${ROOT}:/build" -w /build/repo-lts/x86_64 --entrypoint bash "${IMAGE_NAME}" \
+    -c 'set -euo pipefail
+        shopt -s nullglob
+        pkgs=(linux-enigmarsos-lts-*.pkg.tar.zst)
+        ((${#pkgs[@]})) || { echo "no LTS packages in /build/repo-lts/x86_64" >&2; exit 1; }
+        repo-add --new --remove linux-enigmarsos-lts.db.tar.gz "${pkgs[@]}"
+        for stem in linux-enigmarsos-lts.db linux-enigmarsos-lts.files; do
           if [[ -L "${stem}" ]]; then
             cp -a "$(readlink -f "${stem}")" "${stem}.real"
             rm -f "${stem}"

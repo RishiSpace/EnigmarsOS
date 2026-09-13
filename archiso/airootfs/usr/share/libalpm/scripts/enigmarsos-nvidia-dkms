@@ -68,9 +68,9 @@ for kdir in /usr/lib/modules/*; do
   fi
 done
 
-if pacman -Qq linux-enigmarsos >/dev/null 2>&1; then
-  if ! find /usr/lib/modules/*enigmarsos* \( -name 'nvidia.ko' -o -name 'nvidia.ko.*' \) 2>/dev/null | grep -q .; then
-    echo "ERROR: nvidia.ko missing for linux-enigmarsos (live default kernel)" >&2
+if pacman -Qq linux-enigmarsos-lts >/dev/null 2>&1; then
+  if ! find /usr/lib/modules/*enigmarsos-lts* \( -name 'nvidia.ko' -o -name 'nvidia.ko.*' \) 2>/dev/null | grep -q .; then
+    echo "ERROR: nvidia.ko missing for linux-enigmarsos-lts (live default kernel)" >&2
     missing=1
   fi
 fi

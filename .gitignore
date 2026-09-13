@@ -2,7 +2,10 @@
 work/
 out/
 repo/
+repo-lts/
 repo-extras/
+archiso/airootfs/usr/share/enigmarsos/offline-repo/*
+!archiso/airootfs/usr/share/enigmarsos/offline-repo/.gitkeep
 *.iso
 *.img
 *.sfs

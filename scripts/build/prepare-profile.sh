@@ -88,10 +88,38 @@ cp -f "${ROOT}/packages.x86_64" "${ROOT}/archiso/packages.x86_64"
 cp -f "${ROOT}/profiledef.sh" "${ROOT}/archiso/profiledef.sh"
 chmod +x "${ROOT}/archiso/profiledef.sh"
 
-# Snapshot linux-enigmarsos from GitHub Latest into file:///build/repo/x86_64
+# Snapshot rolling linux-enigmarsos (Latest) and LTS (tag lts)
 bash "${ROOT}/scripts/build/fetch-kernel-repo.sh"
+bash "${ROOT}/scripts/build/fetch-lts-repo.sh"
 # Snapshot enigmars-extras (Utils, …) into file:///build/repo-extras/x86_64
 bash "${ROOT}/scripts/build/fetch-extras-repo.sh"
+
+# Bake rolling packages into the squashfs so Calamares can install them offline.
+OFFLINE="${AIO}/usr/share/enigmarsos/offline-repo"
+mkdir -p "${OFFLINE}"
+rm -f "${OFFLINE}"/*
+shopt -s nullglob
+copied=0
+for f in "${ROOT}/repo/x86_64"/linux-enigmarsos-[0-9]*.pkg.tar.zst \
+         "${ROOT}/repo/x86_64"/linux-enigmarsos-headers-*.pkg.tar.zst \
+         "${ROOT}/repo/x86_64"/linux-enigmarsos.db \
+         "${ROOT}/repo/x86_64"/linux-enigmarsos.db.tar.gz \
+         "${ROOT}/repo/x86_64"/linux-enigmarsos.files \
+         "${ROOT}/repo/x86_64"/linux-enigmarsos.files.tar.gz; do
+  [[ -f "${f}" ]] || continue
+  cp -a "${f}" "${OFFLINE}/"
+  copied=1
+done
+shopt -u nullglob
+((copied)) || echo "==> WARNING: no rolling kernel packages to stage for offline install" >&2
+# pacman file:// repo needs the db named after the section
+if [[ -f "${OFFLINE}/linux-enigmarsos.db" && ! -f "${OFFLINE}/enigmarsos-offline.db" ]]; then
+  cp -a "${OFFLINE}/linux-enigmarsos.db" "${OFFLINE}/enigmarsos-offline.db"
+  [[ -f "${OFFLINE}/linux-enigmarsos.db.tar.gz" ]] && \
+    cp -a "${OFFLINE}/linux-enigmarsos.db.tar.gz" "${OFFLINE}/enigmarsos-offline.db.tar.gz" || true
+fi
+echo "==> Offline rolling kernel repo: ${OFFLINE}"
+ls -lh "${OFFLINE}" || true
 
 # Identity applied via pacman hook enigmarsos-os-release (avoids filesystem package conflict)
 

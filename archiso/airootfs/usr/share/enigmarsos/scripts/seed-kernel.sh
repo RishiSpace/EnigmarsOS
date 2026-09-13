@@ -53,7 +53,7 @@ do
 done
 
 if [[ ${copied_kernel} -eq 0 ]]; then
-  found="$(find /run/archiso /boot -type f \( -name 'vmlinuz-linux-enigmarsos' -o -name 'vmlinuz-linux' \) 2>/dev/null | head -1 || true)"
+  found="$(find /run/archiso /boot -type f \( -name 'vmlinuz-linux-enigmarsos-lts' -o -name 'vmlinuz-linux-enigmarsos' \) 2>/dev/null | head -1 || true)"
   if [[ -n "${found}" ]]; then
     copy_one "${found}" "${ROOT}/boot/$(basename "${found}")" && copied_kernel=1
     bdir="$(dirname "${found}")"
@@ -66,7 +66,7 @@ if [[ ${copied_kernel} -eq 0 ]]; then
   fi
 fi
 
-if [[ ! -r "${ROOT}/boot/vmlinuz-linux-enigmarsos" && ! -r "${ROOT}/boot/vmlinuz-linux" ]]; then
+if [[ ! -r "${ROOT}/boot/vmlinuz-linux-enigmarsos-lts" && ! -r "${ROOT}/boot/vmlinuz-linux-enigmarsos" ]]; then
   echo "ERROR: could not seed a kernel into target /boot" >&2
   echo "Live /boot:" >&2
   ls -la /boot 2>&1 || true

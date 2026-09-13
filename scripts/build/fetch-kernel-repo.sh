@@ -31,6 +31,8 @@ assets = rel.get("assets") or []
 wanted = []
 for a in assets:
     name = a.get("name") or ""
+    if name.startswith("linux-enigmarsos-lts"):
+        continue
     if name.startswith("linux-enigmarsos") and (
         name.endswith(".pkg.tar.zst")
         or name in (
@@ -66,7 +68,7 @@ for a in wanted:
 PY
 
 shopt -s nullglob
-pkgs=("${DEST}"/linux-enigmarsos-*.pkg.tar.zst)
+pkgs=("${DEST}"/linux-enigmarsos-[0-9]*.pkg.tar.zst "${DEST}"/linux-enigmarsos-headers-*.pkg.tar.zst)
 ((${#pkgs[@]})) || { echo "error: no packages in ${DEST}" >&2; exit 1; }
 
 # Prefer the db shipped on Latest (Ubuntu CI has no pacman/repo-add).

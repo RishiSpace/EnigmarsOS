@@ -2,7 +2,7 @@
 
 Arch-based Linux with KDE Plasma 6. Privacy defaults, Calamares installer, Limine on the installed system.
 
-Default kernel is [`linux-enigmarsos`](https://github.com/RishiSpace/linux-enigmarsos) (Arch + BORE). Stock `linux` stays around as a fallback. Userspace extras ([`enigmars-extras`](https://github.com/RishiSpace/enigmars-extras), including Utils) use the same GitHub Releases pacman mirror.
+Live ISO boots [`linux-enigmarsos-lts`](https://github.com/RishiSpace/linux-enigmarsos/tree/lts) (BORE, x86-64-v2). Calamares installs rolling [`linux-enigmarsos`](https://github.com/RishiSpace/linux-enigmarsos) (v3) from packages on the ISO; LTS stays as the Limine fallback. Userspace extras ([`enigmars-extras`](https://github.com/RishiSpace/enigmars-extras), including Utils) use the same GitHub Releases pacman mirror.
 
 ## Layout
 

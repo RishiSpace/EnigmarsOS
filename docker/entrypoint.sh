@@ -136,25 +136,25 @@ iso_has_enigmarsos_nvidia() {
   local root="${WORK}/x86_64/airootfs"
   local sfs="${WORK}/iso/arch/x86_64/airootfs.sfs"
   if [[ -d "${root}/usr/lib/modules" ]] && \
-     find "${root}/usr/lib/modules" -path '*enigmarsos*' \( -name 'nvidia.ko' -o -name 'nvidia.ko.*' \) 2>/dev/null | grep -q .; then
+     find "${root}/usr/lib/modules" -path '*enigmarsos-lts*' \( -name 'nvidia.ko' -o -name 'nvidia.ko.*' \) 2>/dev/null | grep -q .; then
     return 0
   fi
   if [[ -f "${sfs}" ]] && command -v unsquashfs >/dev/null 2>&1 && \
-     unsquashfs -l "${sfs}" 2>/dev/null | grep -E 'enigmarsos.*/nvidia\.ko' | grep -q .; then
+     unsquashfs -l "${sfs}" 2>/dev/null | grep -E 'enigmarsos-lts.*/nvidia\.ko' | grep -q .; then
     return 0
   fi
   return 1
 }
 
-echo "==> Verifying nvidia.ko for linux-enigmarsos (live default kernel)"
+echo "==> Verifying nvidia.ko for linux-enigmarsos-lts (live default kernel)"
 if ! iso_has_enigmarsos_nvidia; then
-  echo "ERROR: ISO is missing nvidia.ko for linux-enigmarsos." >&2
+  echo "ERROR: ISO is missing nvidia.ko for linux-enigmarsos-lts." >&2
   echo "       nvidia-open-dkms failed to build against that kernel." >&2
   echo "       Not publishing this image." >&2
   rm -f "${OUT}"/*.iso "${OUT}"/SHA256SUMS
   exit 1
 fi
-echo "==> nvidia.ko present for linux-enigmarsos"
+echo "==> nvidia.ko present for linux-enigmarsos-lts"
 
 echo "==> checksums"
 (

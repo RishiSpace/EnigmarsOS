@@ -17,7 +17,8 @@ sudo sbctl sign -s /boot/efi/EFI/BOOT/BOOTX64.EFI
 sudo sbctl sign -s /boot/efi/EFI/EnigmarsOS/BOOTX64.EFI
 sudo sbctl sign -s /boot/efi/EFI/EnigmarsOS/vmlinuz-linux-enigmarsos
 sudo sbctl sign -s /boot/vmlinuz-linux-enigmarsos
-# also sign vmlinuz-linux on ESP and /boot if you use the fallback kernel
+sudo sbctl sign -s /boot/efi/EFI/EnigmarsOS/vmlinuz-linux-enigmarsos-lts
+sudo sbctl sign -s /boot/vmlinuz-linux-enigmarsos-lts
 
 sudo sbctl verify
 ```

@@ -135,16 +135,16 @@ done
 stage_one /boot/amd-ucode.img amd-ucode.img || true
 stage_one /boot/intel-ucode.img intel-ucode.img || true
 
-# Default Limine entry: EnigmarsOS kernel, then stock Arch linux, then others
+# Default Limine entry: rolling v3, then LTS fallback, then anything else
 sorted_pkgs=()
 for p in "${STAGED_PKGS[@]}"; do
   [[ "${p}" == "linux-enigmarsos" ]] && sorted_pkgs+=("${p}")
 done
 for p in "${STAGED_PKGS[@]}"; do
-  [[ "${p}" == "linux" ]] && sorted_pkgs+=("${p}")
+  [[ "${p}" == "linux-enigmarsos-lts" ]] && sorted_pkgs+=("${p}")
 done
 for p in "${STAGED_PKGS[@]}"; do
-  [[ "${p}" != "linux-enigmarsos" && "${p}" != "linux" ]] && sorted_pkgs+=("${p}")
+  [[ "${p}" != "linux-enigmarsos" && "${p}" != "linux-enigmarsos-lts" ]] && sorted_pkgs+=("${p}")
 done
 
 # Root cmdline (same logic as install-limine)
@@ -204,8 +204,13 @@ fi
 # Build menu entries
 ENTRIES=""
 for pkg in "${sorted_pkgs[@]}"; do
-  label="EnigmarsOS"
-  [[ "${pkg}" != "linux" ]] && label="EnigmarsOS (${pkg})"
+  if [[ "${pkg}" == "linux-enigmarsos" ]]; then
+    label="EnigmarsOS"
+  elif [[ "${pkg}" == "linux-enigmarsos-lts" ]]; then
+    label="EnigmarsOS (LTS)"
+  else
+    label="EnigmarsOS (${pkg})"
+  fi
   ENTRIES+="//${label}
     protocol: linux
     path: boot():/EFI/EnigmarsOS/vmlinuz-${pkg}

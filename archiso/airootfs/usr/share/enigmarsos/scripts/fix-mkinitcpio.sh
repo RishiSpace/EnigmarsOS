@@ -28,7 +28,7 @@ EOF
 }
 
 write_preset linux-enigmarsos
-write_preset linux
+write_preset linux-enigmarsos-lts
 
 if [[ ! -f /etc/mkinitcpio.conf ]]; then
   cat >/etc/mkinitcpio.conf <<'EOF'
@@ -115,7 +115,7 @@ if [[ -f /etc/mkinitcpio.conf ]]; then
   drop_unresolvable_modules /etc/mkinitcpio.conf
 fi
 
-if [[ ! -r /boot/vmlinuz-linux-enigmarsos && ! -r /boot/vmlinuz-linux ]]; then
+if [[ ! -r /boot/vmlinuz-linux-enigmarsos && ! -r /boot/vmlinuz-linux-enigmarsos-lts ]]; then
   echo "ERROR: no kernel in target /boot (seed-kernel should have copied it)" >&2
   ls -la /boot || true
   exit 1

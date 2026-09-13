@@ -71,8 +71,8 @@ if [[ "${ROOT_SRC}" == /dev/mapper/* ]] && [[ -r /etc/crypttab ]]; then
 fi
 
 # --- Kernel present on the installed root? ---
-[[ -r /boot/vmlinuz-linux ]] || die "/boot/vmlinuz-linux missing — seed-kernel should have run first"
-[[ -r /boot/initramfs-linux.img ]] || die "/boot/initramfs-linux.img missing"
+[[ -r /boot/vmlinuz-linux-enigmarsos-lts ]] || die "/boot/vmlinuz-linux-enigmarsos-lts missing — seed-kernel should have run first"
+[[ -r /boot/initramfs-linux-enigmarsos-lts.img ]] || die "/boot/initramfs-linux-enigmarsos-lts.img missing"
 
 # --- ESP / FAT boot volume detection (must happen before path decisions) ---
 ESP=""
@@ -123,16 +123,16 @@ if is_fat "${BOOT_FSTYPE}" && [[ "$(findmnt -no TARGET /boot 2>/dev/null)" == "/
   # /boot is already a FAT volume (possibly the ESP itself)
   CONF_DIR="/boot"
   if [[ "${ESP}" == "/boot" ]]; then
-    KPATH="boot():/vmlinuz-linux"
-    IPATH="boot():/initramfs-linux.img"
-    FPATH="boot():/initramfs-linux-fallback.img"
+    KPATH="boot():/vmlinuz-linux-enigmarsos-lts"
+    IPATH="boot():/initramfs-linux-enigmarsos-lts.img"
+    FPATH="boot():/initramfs-linux-enigmarsos-lts-fallback.img"
     UCODE_AMD="boot():/amd-ucode.img"
     UCODE_INTEL="boot():/intel-ucode.img"
   else
     # Separate FAT /boot; conf may live on ESP → use uuid(FS-UUID)
-    KPATH="uuid(${BOOT_UUID}):/vmlinuz-linux"
-    IPATH="uuid(${BOOT_UUID}):/initramfs-linux.img"
-    FPATH="uuid(${BOOT_UUID}):/initramfs-linux-fallback.img"
+    KPATH="uuid(${BOOT_UUID}):/vmlinuz-linux-enigmarsos-lts"
+    IPATH="uuid(${BOOT_UUID}):/initramfs-linux-enigmarsos-lts.img"
+    FPATH="uuid(${BOOT_UUID}):/initramfs-linux-enigmarsos-lts-fallback.img"
     UCODE_AMD="uuid(${BOOT_UUID}):/amd-ucode.img"
     UCODE_INTEL="uuid(${BOOT_UUID}):/intel-ucode.img"
   fi
@@ -141,16 +141,16 @@ else
   # /boot is btrfs/ext4/xfs (or not FAT). Stage onto ESP so Limine can read them.
   CONF_DIR="${ESP}"
   echo "    /boot fstype=${BOOT_FSTYPE:-unknown} is not FAT — staging kernel files onto ESP (${STAGE_DIR})"
-  stage_to_esp /boot/vmlinuz-linux vmlinuz-linux || die "cannot stage vmlinuz-linux"
-  stage_to_esp /boot/initramfs-linux.img initramfs-linux.img || die "cannot stage initramfs-linux.img"
-  stage_to_esp /boot/initramfs-linux-fallback.img initramfs-linux-fallback.img || true
+  stage_to_esp /boot/vmlinuz-linux-enigmarsos-lts vmlinuz-linux-enigmarsos-lts || die "cannot stage vmlinuz-linux-enigmarsos-lts"
+  stage_to_esp /boot/initramfs-linux-enigmarsos-lts.img initramfs-linux-enigmarsos-lts.img || die "cannot stage initramfs-linux-enigmarsos-lts.img"
+  stage_to_esp /boot/initramfs-linux-enigmarsos-lts-fallback.img initramfs-linux-enigmarsos-lts-fallback.img || true
   stage_to_esp /boot/amd-ucode.img amd-ucode.img || true
   stage_to_esp /boot/intel-ucode.img intel-ucode.img || true
 
   # conf lives on ESP → boot(): resolves to that partition
-  KPATH="boot():/EFI/EnigmarsOS/vmlinuz-linux"
-  IPATH="boot():/EFI/EnigmarsOS/initramfs-linux.img"
-  FPATH="boot():/EFI/EnigmarsOS/initramfs-linux-fallback.img"
+  KPATH="boot():/EFI/EnigmarsOS/vmlinuz-linux-enigmarsos-lts"
+  IPATH="boot():/EFI/EnigmarsOS/initramfs-linux-enigmarsos-lts.img"
+  FPATH="boot():/EFI/EnigmarsOS/initramfs-linux-enigmarsos-lts-fallback.img"
   UCODE_AMD="boot():/EFI/EnigmarsOS/amd-ucode.img"
   UCODE_INTEL="boot():/EFI/EnigmarsOS/intel-ucode.img"
 fi
@@ -313,13 +313,13 @@ fi
 if [[ ! -f "${ESP}/limine.conf" && ! -f "${ESP}/EFI/BOOT/limine.conf" ]]; then
   die "limine.conf was not written to ESP"
 fi
-if [[ ! -f "${STAGE_DIR}/vmlinuz-linux" ]] && [[ ! -f /boot/vmlinuz-linux ]]; then
-  die "no staged or in-place kernel for Limine to load"
+if [[ ! -f "${STAGE_DIR}/vmlinuz-linux-enigmarsos-lts" ]] && [[ ! -f /boot/vmlinuz-linux-enigmarsos-lts ]]; then
+  die "no staged or in-place LTS kernel for Limine to load"
 fi
 # When we staged, require the staged kernel
 if ! is_fat "${BOOT_FSTYPE}" || [[ "${ESP}" != "/boot" && "$(findmnt -no UUID "${ESP}" 2>/dev/null)" != "${BOOT_UUID}" ]]; then
-  [[ -f "${STAGE_DIR}/vmlinuz-linux" ]] || die "staged vmlinuz-linux missing on ESP"
-  [[ -f "${STAGE_DIR}/initramfs-linux.img" ]] || die "staged initramfs-linux.img missing on ESP"
+  [[ -f "${STAGE_DIR}/vmlinuz-linux-enigmarsos-lts" ]] || die "staged vmlinuz-linux-enigmarsos-lts missing on ESP"
+  [[ -f "${STAGE_DIR}/initramfs-linux-enigmarsos-lts.img" ]] || die "staged initramfs-linux-enigmarsos-lts.img missing on ESP"
 fi
 
 # Stage every kernel (prefers linux-enigmarsos) and rewrite limine.conf.

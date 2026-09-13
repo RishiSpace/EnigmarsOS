@@ -8,6 +8,30 @@ echo "EnigmarsOS post-install starting..."
 rm -f /etc/enigmarsos/iso-build \
       /etc/pacman.d/hooks/zz-enigmarsos-nvidia-dkms.hook
 
+# Rolling v3 kernel from onboard packages (offline-safe). LTS stays as fallback.
+install_rolling_kernel() {
+  shopt -s nullglob
+  local pkgs=() p
+  for p in /usr/share/enigmarsos/offline-repo/linux-enigmarsos-[0-9]*.pkg.tar.zst \
+           /usr/share/enigmarsos/offline-repo/linux-enigmarsos-headers-[0-9]*.pkg.tar.zst; do
+    [[ -f "${p}" ]] || continue
+    pkgs+=("${p}")
+  done
+  shopt -u nullglob
+  if ((${#pkgs[@]})); then
+    echo "==> Installing linux-enigmarsos (rolling) from onboard packages"
+    pacman -U --noconfirm --needed "${pkgs[@]}"
+    return 0
+  fi
+  echo "WARNING: onboard rolling kernel packages missing; trying configured repos" >&2
+  if pacman -S --noconfirm --needed linux-enigmarsos linux-enigmarsos-headers; then
+    return 0
+  fi
+  echo "WARNING: could not install linux-enigmarsos; installed system stays on LTS" >&2
+  return 0
+}
+install_rolling_kernel || true
+
 # NVIDIA: keep ISO drivers if a GPU is present, else remove them
 if [[ -x /usr/share/enigmarsos/scripts/enigmarsos-nvidia-setup.sh ]]; then
   /usr/share/enigmarsos/scripts/enigmarsos-nvidia-setup.sh install || true
