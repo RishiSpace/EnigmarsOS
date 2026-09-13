@@ -1,0 +1,104 @@
+name: ISO (debug)
+
+# Manual-only debugging build: same ISO pipeline as iso.yml but never
+# uploads to SourceForge. No schedule, no tag triggers.
+on:
+  workflow_dispatch:
+    inputs:
+      skip_image_build:
+        description: "Skip Docker image rebuild (1 = reuse cached builder image)"
+        required: false
+        default: "0"
+
+permissions:
+  contents: read
+
+jobs:
+  structure:
+    name: Validate structure
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run structure check
+        run: bash ./scripts/dev/sync-airootfs-check.sh
+      - name: Logo present
+        run: test -f public/EnigmarsOS.png
+      - name: Branding URL
+        run: |
+          grep -q 'enigmarsos.rishispace.dev' archiso/airootfs/usr/share/libalpm/scripts/enigmarsos-os-release
+          grep -q 'enigmarsos.rishispace.dev' profiledef.sh
+
+  iso-debug:
+    name: Build ISO (no upload)
+    needs: structure
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc \
+            /usr/local/share/boost "$AGENT_TOOLSDIRECTORY" || true
+          df -h
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build ISO via Docker
+        env:
+          ENIGMARSOS_SKIP_IMAGE_BUILD: ${{ inputs.skip_image_build }}
+        run: |
+          # Same mkarchiso pipeline as iso.yml; entrypoint fails the job
+          # if nvidia.ko is missing for linux-enigmarsos.
+          ./scripts/build/docker-build-iso.sh
+
+      # make.log lives in the mkarchiso chroot (work/), which is
+      # discarded with the runner. The hook already prints its tail
+      # into the job log; this keeps the full file for diagnosis.
+      - name: Collect DKMS failure logs
+        if: failure()
+        run: |
+          set -euo pipefail
+          sudo chown -R "$(id -u):$(id -g)" work 2>/dev/null || true
+          mkdir -p failure-logs
+          shopt -s nullglob
+          logs=(work/x86_64/airootfs/var/lib/dkms/nvidia/*/build/make.log)
+          if ((${#logs[@]})); then
+            for log in "${logs[@]}"; do
+              cp -v "${log}" "failure-logs/$(echo "${log}" | tr '/' '_')" || true
+            done
+          else
+            echo "no nvidia make.log found under work/" | tee failure-logs/NONE-FOUND.txt
+          fi
+          ls -lh failure-logs/
+
+      - name: Upload DKMS failure logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dkms-failure-logs
+          path: failure-logs/
+          retention-days: 14
+
+      - name: Checksums
+        run: |
+          set -euo pipefail
+          # Docker mkarchiso leaves root-owned files; reclaim for the runner
+          sudo chown -R "$(id -u):$(id -g)" out work 2>/dev/null || true
+          chmod u+w out 2>/dev/null || true
+
+          cd out
+          shopt -s nullglob
+          isos=(*.iso)
+          if ((${#isos[@]} == 0)); then
+            echo "error: no ISO found in out/" >&2
+            ls -la
+            exit 1
+          fi
+
+          # Always rewrite checksums as the runner user (avoids root-owned SHA256SUMS)
+          rm -f SHA256SUMS
+          sha256sum "${isos[@]}" > SHA256SUMS
+          cat SHA256SUMS
+          ls -lh
