@@ -33,11 +33,6 @@ dump_nvidia_logs() {
   shopt -u nullglob
 }
 
-# Headers may ship a v3 fixdep; rebuild before DKMS on this CPU.
-if [[ -x /usr/share/libalpm/scripts/enigmarsos-kbuild-hosttools ]]; then
-  /usr/share/libalpm/scripts/enigmarsos-kbuild-hosttools || true
-fi
-
 # Do not use `dkms autoinstall`: in the GHA container uname -r is the
 # Ubuntu host (e.g. 6.17.0-*-azure), which has no headers in the chroot.
 shopt -s nullglob
