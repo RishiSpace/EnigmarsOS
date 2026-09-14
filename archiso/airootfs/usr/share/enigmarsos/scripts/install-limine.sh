@@ -106,6 +106,13 @@ BOOT_UUID="$(findmnt -no UUID /boot 2>/dev/null || true)"
 STAGE_DIR="${ESP}/EFI/EnigmarsOS"
 mkdir -p "${STAGE_DIR}" "${ESP}/EFI/BOOT"
 
+for src in \
+  /usr/share/enigmarsos/logos/EnigmarsOS.png \
+  /usr/share/pixmaps/enigmarsos.png; do
+  [[ -f "${src}" ]] || continue
+  install -Dm644 "${src}" "${STAGE_DIR}/wallpaper.png" && break
+done
+
 stage_to_esp() {
   local src="$1" dest_name="$2"
   if [[ -r "${src}" ]]; then
@@ -197,10 +204,13 @@ write_conf() {
 # EnigmarsOS Limine configuration
 # Kernel/initramfs must be on FAT (ESP). Root FS may be btrfs/ext4/xfs.
 timeout: 5
-default_entry: 1
+default_entry: EnigmarsOS/EnigmarsOS
 interface_branding: EnigmarsOS
 interface_branding_colour: 6
-term_background: 000000
+wallpaper: boot():/EFI/EnigmarsOS/wallpaper.png
+wallpaper_style: centered
+backdrop: 000000
+term_background: 80000000
 
 /+EnigmarsOS
 //EnigmarsOS

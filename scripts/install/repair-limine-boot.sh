@@ -114,6 +114,12 @@ done
 shopt -u nullglob
 [[ -r "${MNT}/boot/amd-ucode.img" ]] && cp -a "${MNT}/boot/amd-ucode.img" "${STAGE}/amd-ucode.img"
 [[ -r "${MNT}/boot/intel-ucode.img" ]] && cp -a "${MNT}/boot/intel-ucode.img" "${STAGE}/intel-ucode.img"
+for src in \
+  "${MNT}/usr/share/enigmarsos/logos/EnigmarsOS.png" \
+  "${MNT}/usr/share/pixmaps/enigmarsos.png"; do
+  [[ -f "${src}" ]] || continue
+  cp -a "${src}" "${STAGE}/wallpaper.png" && break
+done"
 
 # Ensure Limine EFI binary exists
 if [[ -r "${MNT}/usr/share/limine/BOOTX64.EFI" ]]; then
@@ -163,10 +169,13 @@ write_conf() {
 # EnigmarsOS Limine configuration (repaired)
 # Kernels staged on ESP — Limine cannot read btrfs/ext4.
 timeout: 5
-default_entry: 1
+default_entry: EnigmarsOS/EnigmarsOS
 interface_branding: EnigmarsOS
 interface_branding_colour: 6
-term_background: 000000
+wallpaper: boot():/EFI/EnigmarsOS/wallpaper.png
+wallpaper_style: centered
+backdrop: 000000
+term_background: 80000000
 
 /+EnigmarsOS
 //EnigmarsOS

@@ -82,6 +82,20 @@ fi
 STAGE_DIR="${ESP}/EFI/EnigmarsOS"
 mkdir -p "${STAGE_DIR}" "${ESP}/EFI/BOOT"
 
+stage_limine_wallpaper() {
+  local src
+  for src in \
+    /usr/share/enigmarsos/logos/EnigmarsOS.png \
+    /usr/share/pixmaps/enigmarsos.png; do
+    [[ -f "${src}" ]] || continue
+    install -Dm644 "${src}" "${STAGE_DIR}/wallpaper.png" || continue
+    echo "    staged Limine wallpaper from ${src}"
+    return 0
+  done
+  return 1
+}
+stage_limine_wallpaper || true
+
 # Free space warning (need room for kernel + initramfs ~200M+)
 AVAIL_KB="$(df -Pk "${ESP}" 2>/dev/null | awk 'NR==2 {print $4}')"
 if [[ -n "${AVAIL_KB}" && "${AVAIL_KB}" -lt 200000 ]]; then
@@ -229,6 +243,25 @@ ${UCODE_BLOCK}    module_path: boot():/EFI/EnigmarsOS/initramfs-${pkg}-fallback.
   fi
 done
 
+# default_entry: 1 would select the directory itself and skip autoboot.
+# Path form selects the rolling kernel while /+ keeps the menu expanded.
+DEFAULT_ENTRY="EnigmarsOS/EnigmarsOS"
+has_rolling=0
+for p in "${sorted_pkgs[@]}"; do
+  [[ "${p}" == "linux-enigmarsos" ]] && has_rolling=1
+done
+if [[ "${has_rolling}" -ne 1 ]]; then
+  DEFAULT_ENTRY="EnigmarsOS/EnigmarsOS (LTS)"
+fi
+
+WALLPAPER_BLOCK="term_background: 000000"
+if [[ -f "${STAGE_DIR}/wallpaper.png" ]]; then
+  WALLPAPER_BLOCK="wallpaper: boot():/EFI/EnigmarsOS/wallpaper.png
+wallpaper_style: centered
+backdrop: 000000
+term_background: 80000000"
+fi
+
 write_conf() {
   local dest="$1"
   mkdir -p "$(dirname "${dest}")"
@@ -236,10 +269,10 @@ write_conf() {
 # EnigmarsOS Limine configuration (managed by sync-esp-boot)
 # Regenerated after kernel/initramfs updates — do not hand-edit permanently.
 timeout: 5
-default_entry: 1
+default_entry: ${DEFAULT_ENTRY}
 interface_branding: EnigmarsOS
 interface_branding_colour: 6
-term_background: 000000
+${WALLPAPER_BLOCK}
 
 /+EnigmarsOS
 ${ENTRIES}/+Advanced options
