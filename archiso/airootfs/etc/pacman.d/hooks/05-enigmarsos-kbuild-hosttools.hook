@@ -1,0 +1,18 @@
+# Rebuild v3-compiled kbuild host tools before 70-dkms-install.
+# ISO pacstrap only (this hook lives in /etc/pacman.d/hooks).
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = linux-enigmarsos-lts-headers
+Target = linux-enigmarsos-headers
+Target = linux-headers
+Target = nvidia-open-dkms
+Target = nvidia-dkms
+
+[Action]
+Description = Rebuilding kbuild host tools for this CPU...
+When = PostTransaction
+Depends = gcc
+Depends = make
+Exec = /usr/share/libalpm/scripts/enigmarsos-kbuild-hosttools

@@ -151,6 +151,11 @@ if ! iso_has_enigmarsos_nvidia; then
   echo "ERROR: ISO is missing nvidia.ko for linux-enigmarsos-lts." >&2
   echo "       nvidia-open-dkms failed to build against that kernel." >&2
   echo "       Not publishing this image." >&2
+  if [[ -f "${WORK}/iso/arch/x86_64/airootfs.sfs" ]] && command -v unsquashfs >/dev/null 2>&1; then
+    echo "==> module files matching nvidia/enigmarsos-lts in squashfs:" >&2
+    unsquashfs -l "${WORK}/iso/arch/x86_64/airootfs.sfs" 2>/dev/null \
+      | grep -E 'enigmarsos-lts|nvidia\.ko' | head -40 >&2 || true
+  fi
   rm -f "${OUT}"/*.iso "${OUT}"/SHA256SUMS
   exit 1
 fi
