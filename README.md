@@ -1,5 +1,7 @@
 # EnigmarsOS
 
+<a href="https://sourceforge.net/projects/enigmaos/"><img src="https://b.sf-syn.com/badge_img/4121888/oss-rising-star-black?achievement=oss-rising-star" alt="EnigmarsOS - Rising Star" height="96"></a>
+
 Arch-based Linux with KDE Plasma 6. Privacy defaults, Calamares installer, Limine on the installed system.
 
 Live ISO boots [`linux-enigmarsos-lts`](https://github.com/RishiSpace/linux-enigmarsos/tree/lts) (BORE, x86-64-v2). Calamares installs rolling [`linux-enigmarsos`](https://github.com/RishiSpace/linux-enigmarsos) (v3) from packages on the ISO; LTS stays as the Limine fallback. Userspace extras ([`enigmars-extras`](https://github.com/RishiSpace/enigmars-extras), including Utils) use the same GitHub Releases pacman mirror.
