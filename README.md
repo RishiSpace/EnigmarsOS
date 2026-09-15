@@ -2,8 +2,7 @@
 
 <a href="https://sourceforge.net/projects/enigmaos/"><img src="https://b.sf-syn.com/badge_img/4121888/oss-rising-star-black?achievement=oss-rising-star" alt="EnigmarsOS - Rising Star" height="96"></a>
 
-<img width="1922" height="1081" alt="Screenshot_20260816_211559" src="https://github.com/user-attachments/assets/31cc3967-a270-4906-a5f4-4e7d159da587" />
-
+<img width="1920" height="1076" alt="Screenshot_20260915_232416" src="https://github.com/user-attachments/assets/7d8842c2-2bcc-4505-9024-d61cd2d4672d" />
 
 Arch-based Linux with KDE Plasma 6. Privacy defaults, Calamares installer, Limine on the installed system.
 
