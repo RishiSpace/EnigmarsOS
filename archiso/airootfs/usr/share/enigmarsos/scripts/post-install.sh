@@ -28,9 +28,19 @@ install_rolling_kernel() {
     return 0
   fi
   echo "WARNING: could not install linux-enigmarsos; installed system stays on LTS" >&2
-  return 0
+  return 1
 }
-install_rolling_kernel || true
+
+# The onboard repo is a frozen ISO-day snapshot: it must never shadow
+# GitHub Latest on the installed system, or kernel updates stop forever.
+sed -i '/enigmarsos-offline.conf/d' /etc/pacman.conf 2>/dev/null || true
+rm -f /etc/pacman.d/enigmarsos-offline.conf
+if install_rolling_kernel; then
+  # ~230 MB of single-use packages; drop them once they served their purpose.
+  rm -rf /usr/share/enigmarsos/offline-repo
+else
+  echo "WARNING: keeping onboard packages for a manual retry" >&2
+fi
 
 # NVIDIA: keep ISO drivers if a GPU is present, else remove them
 if [[ -x /usr/share/enigmarsos/scripts/enigmarsos-nvidia-setup.sh ]]; then

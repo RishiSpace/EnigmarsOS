@@ -58,6 +58,9 @@ grep -q 'enigmars-extras.conf' "${ROOT}/archiso/airootfs/etc/pacman.conf"
 grep -q 'linux-enigmarsos-lts.conf' "${ROOT}/archiso/airootfs/etc/pacman.conf"
 grep -q 'vmlinuz-linux-enigmarsos-lts' "${ROOT}/archiso/efiboot/loader/entries/01-enigmarsos-linux.conf"
 grep -q 'install_rolling_kernel' "${ROOT}/archiso/airootfs/usr/share/enigmarsos/scripts/post-install.sh"
+grep -q 'enigmarsos-offline.conf/d' "${ROOT}/archiso/airootfs/usr/share/enigmarsos/scripts/post-install.sh"
+grep -q 'rm -rf /usr/share/enigmarsos/offline-repo' "${ROOT}/archiso/airootfs/usr/share/enigmarsos/scripts/post-install.sh"
+grep -q 'releases/download/lts' "${ROOT}/scripts/build/prepare-profile.sh"
 # Identity branding must target rishispace
 grep -q 'enigmarsos.rishispace.dev' "${ROOT}/archiso/airootfs/usr/share/libalpm/scripts/enigmarsos-os-release"
 grep -q 'rishi@rishispace.dev' "${ROOT}/packages/enigmarsos-filesystem/PKGBUILD" || true
