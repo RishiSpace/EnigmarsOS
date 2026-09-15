@@ -10,12 +10,22 @@ HISTSIZE=50000
 SAVEHIST=50000
 setopt HIST_IGNORE_DUPS SHARE_HISTORY EXTENDED_HISTORY
 
-# Completion
-autoload -Uz compinit && compinit
+# Completion (cached dump; full rescan at most once a day)
+autoload -Uz compinit
+_zcompdump="${ZDOTDIR:-$HOME}/.zcompdump"
+if [[ -f "${_zcompdump}" && -n "$(find "${_zcompdump}" -mtime -1 2>/dev/null)" ]]; then
+  compinit -C -d "${_zcompdump}"
+else
+  compinit -d "${_zcompdump}"
+fi
+unset _zcompdump
 zstyle ':completion:*' menu select
 
-# Plugins when available
+# Plugins when available (highlighting last: it wraps ZLE widgets)
 [[ -r /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh ]] && source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+# Only the main highlighter: brackets/cursor/line passes cost per-keystroke
+# latency without adding readability. Must be set before sourcing.
+ZSH_HIGHLIGHT_HIGHLIGHTERS=(main)
 [[ -r /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]] && source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # Tools

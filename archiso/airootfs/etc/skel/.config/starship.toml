@@ -1,4 +1,10 @@
 # EnigmarsOS Starship prompt — minimal, fast, cyan accent
+# Only the modules in `format` below ever run: no cloud/k8s/battery/time
+# probes. The two timeouts bound worst-case prompt latency: slow module
+# commands are dropped instead of stalling Enter.
+scan_timeout = 10
+command_timeout = 250
+
 format = """
 $username\
 $hostname\
